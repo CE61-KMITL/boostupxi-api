@@ -15,8 +15,8 @@ describe('AppController', () => {
   });
 
   describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+    it('should return "THIS IS A BACKEND API FOR CE BOOSTUP XI. 📢"', () => {
+      expect(appController.getHello()).toBe('THIS IS A BACKEND API FOR CE BOOSTUP XI. 📢');
     });
   });
 });
