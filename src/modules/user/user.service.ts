@@ -1,7 +1,8 @@
-import { Injectable, HttpException } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { UserI } from './interfaces/user.interface';
 import { InjectModel } from '@nestjs/mongoose';
-import { CreateUserDto, UpdateUserDto } from './dto';
 import { User } from './schemas/user.schema';
 import { Model } from 'mongoose';
 
@@ -11,12 +12,47 @@ export class UserService {
     @InjectModel(User.name) private readonly userModel: Model<UserI>,
   ) {}
 
-  async createUser(createUserDto: CreateUserDto): Promise<UserI> {
+  async create(createUserDto: CreateUserDto): Promise<UserI> {
     try {
       const newUser = await this.userModel.create(createUserDto);
       return newUser;
     } catch (error) {
-      throw new HttpException('Error creating user', 500);
+      throw new HttpException('BAD_REQUEST', HttpStatus.BAD_REQUEST);
     }
+  }
+
+  async findAll(): Promise<UserI[]> {
+    const users = await this.userModel.find();
+    return users;
+  }
+
+  async findOne(id: string): Promise<UserI> {
+    const user = await this.userModel.findById(id);
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    return user;
+  }
+
+  async update(id: string, updateUserDto: UpdateUserDto) {
+    try {
+      const user = await this.userModel.findByIdAndUpdate(id, updateUserDto, {
+        new: true,
+      });
+      return user;
+    } catch (error) {
+      throw new HttpException(
+        'INTERNAL_SERVER_ERROR',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async remove(id: string) {
+    const user = await this.userModel.findByIdAndDelete(id);
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    throw new HttpException('User deleted', HttpStatus.OK);
   }
 }

@@ -15,11 +15,8 @@ export class User extends Document {
   @Prop({ default: 0 })
   score: number;
 
-  @Prop({ default: 'user' })
+  @Prop({ default: 'student' })
   role: string;
-
-  @Prop({ default: 0 })
-  finished: number;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

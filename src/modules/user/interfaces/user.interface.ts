@@ -6,5 +6,4 @@ export interface UserI extends Document {
   password: string;
   score: number;
   role: string;
-  finished: number;
 }
