@@ -29,7 +29,7 @@ export class UserService {
   async findAll(): Promise<UserI[]> {
     const users = await this.userModel
       .find()
-      .select('-_id -password -__v')
+      .select('-password -__v')
       .exec();
     return users;
   }
@@ -37,7 +37,7 @@ export class UserService {
   async findOne(id: string): Promise<UserI> {
     const user = await this.userModel
       .findById(id)
-      .select('-_id -password -__v')
+      .select('-password -__v')
       .exec();
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
@@ -51,7 +51,7 @@ export class UserService {
         .findByIdAndUpdate(id, updateUserDto, {
           new: true,
         })
-        .select('-_id -password -__v')
+        .select('-password -__v')
         .exec();
       return user;
     } catch (error) {

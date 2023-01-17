@@ -15,8 +15,8 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async generateToken(userId: string) {
-    const payload = { sub: userId };
+  async generateToken(userId: string, role: string) {
+    const payload = { sub: userId, role };
     return {
       access_token: this.jwtService.sign(payload),
     };
@@ -34,7 +34,7 @@ export class AuthService {
     if (!isPasswordMatching) {
       throw new HttpException('INVALID_CREDENTIALS', HttpStatus.UNAUTHORIZED);
     }
-    return this.generateToken(user._id);
+    return this.generateToken(user._id, user.role);
   }
 
   async register(createUserDto: CreateUserDto) {
