@@ -11,7 +11,10 @@ import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserI } from './interfaces/user.interface';
+import { UseGuards } from '@nestjs/common';
+import { JwtGuard } from 'src/auth/guard/jwt.guard';
 
+@UseGuards(JwtGuard)
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -26,8 +29,8 @@ export class UserController {
     return await this.userService.findAll();
   }
 
-  @Get(':id') 
-  async findOne(@Param('id') id: string) : Promise<UserI> {
+  @Get(':id')
+  async findOne(@Param('id') id: string): Promise<UserI> {
     return await this.userService.findOne(id);
   }
 

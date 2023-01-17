@@ -20,7 +20,7 @@ export class CreateUserDto {
   @IsNotEmpty()
   @IsString()
   @MinLength(8)
-  readonly password: string;
+  password: string;
 
   @IsNotEmpty()
   @IsNumber()
