@@ -13,11 +13,11 @@ import {
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { UserI } from './interfaces/user.interface';
+import { UserI } from '../../shared/interfaces/user.interface';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { Roles } from 'src/auth/decorators/role.decorator';
-import { Role } from 'src/auth/interface/role.enum';
+import { Role } from 'src/shared/interfaces/role.enum';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 
 @UseGuards(JwtGuard)

@@ -3,7 +3,7 @@ import { LoginDto } from './dto/login.dto';
 import { CreateUserDto } from 'src/modules/user/dto/create-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { Model } from 'mongoose';
-import { UserI } from 'src/modules/user/interfaces/user.interface';
+import { UserI } from 'src/shared/interfaces/user.interface';
 import { User } from 'src/modules/user/schemas/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import * as Bcrypt from 'bcryptjs';
