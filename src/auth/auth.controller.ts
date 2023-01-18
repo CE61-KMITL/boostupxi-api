@@ -3,7 +3,7 @@ import { AuthService } from './auth.service';
 import { JwtGuard } from './guards/jwt.guard';
 import { LoginDto } from './dto/login.dto';
 import { CreateUserDto } from 'src/modules/user/dto/create-user.dto';
-import { Role } from './interface/role.enum';
+import { Role } from '../shared/interfaces/role.enum';
 import { Roles } from './decorators/role.decorator';
 import { RolesGuard } from './guards/roles.guard';
 
