@@ -3,9 +3,12 @@ import { AuthService } from './auth.service';
 import { JwtGuard } from './guards/jwt.guard';
 import { LoginDto } from './dto/login.dto';
 import { CreateUserDto } from 'src/modules/user/dto/create-user.dto';
-import { Role } from '../shared/interfaces/role.enum';
+import { Role } from '../shared/enums/role.enum';
 import { Roles } from './decorators/role.decorator';
 import { RolesGuard } from './guards/roles.guard';
+import { PoliciesGuard } from 'src/casl/guard/policies.guard';
+import { CheckPolicies } from 'src/casl/decorator/check-policy.decorator';
+import { CreateUserPolicyHandler } from 'src/common/policies/create.policy';
 
 @Controller('auth')
 export class AuthController {
@@ -16,8 +19,8 @@ export class AuthController {
     return this.authService.login(loginDto);
   }
 
-  @Roles(Role.ADMIN)
-  @UseGuards(RolesGuard)
+  @UseGuards(PoliciesGuard)
+  @CheckPolicies(new CreateUserPolicyHandler())
   @UseGuards(JwtGuard)
   @Post('register')
   async register(@Body() createUserDto: CreateUserDto) {

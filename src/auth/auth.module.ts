@@ -8,6 +8,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from 'src/modules/user/schemas/user.schema';
 import { RolesGuard } from './guards/roles.guard';
+import { CaslAbilityFactory } from 'src/casl/factory/casl-ability.factory';
 
 @Module({
   imports: [
@@ -23,6 +24,6 @@ import { RolesGuard } from './guards/roles.guard';
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, RolesGuard],
+  providers: [AuthService, JwtStrategy, RolesGuard, CaslAbilityFactory],
 })
 export class AuthModule {}

@@ -12,7 +12,7 @@ export class UserService {
     @InjectModel(User.name) private readonly userModel: Model<UserI>,
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<UserI> {
+  async createUser(createUserDto: CreateUserDto): Promise<UserI> {
     try {
       const newUser = await this.userModel.create(createUserDto);
       return {
@@ -26,7 +26,7 @@ export class UserService {
     }
   }
 
-  async findAll(): Promise<UserI[]> {
+  async getUsers(): Promise<UserI[]> {
     const users = await this.userModel
       .find()
       .select('-password -__v')
@@ -34,7 +34,7 @@ export class UserService {
     return users;
   }
 
-  async findOne(id: string): Promise<UserI> {
+  async getUser(id: string): Promise<UserI> {
     const user = await this.userModel
       .findById(id)
       .select('-password -__v')
@@ -45,7 +45,7 @@ export class UserService {
     return user;
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto): Promise<UserI> {
+  async updateUser(id: string, updateUserDto: UpdateUserDto): Promise<UserI> {
     try {
       const user = await this.userModel
         .findByIdAndUpdate(id, updateUserDto, {
@@ -62,7 +62,7 @@ export class UserService {
     }
   }
 
-  async remove(id: string) {
+  async deleteUser(id: string) {
     const user = await this.userModel.findByIdAndDelete(id);
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);

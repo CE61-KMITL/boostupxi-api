@@ -5,6 +5,7 @@ import {
   MinLength,
   IsNotEmpty,
   IsNumber,
+  Min
 } from 'class-validator';
 
 export class CreateUserDto {
@@ -24,6 +25,7 @@ export class CreateUserDto {
 
   @IsNotEmpty()
   @IsNumber()
+  @Min(0)
   readonly score: number;
 
   @IsNotEmpty()
