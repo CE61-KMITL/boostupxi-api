@@ -8,8 +8,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 
 import { UserModule } from '../user/user.module';
 import { TasksModule } from '../tasks/tasks.module';
-import { AuthModule } from 'src/auth/auth.module';
-import { CaslModule } from 'src/casl/casl.module';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
@@ -24,7 +23,6 @@ import { CaslModule } from 'src/casl/casl.module';
         uri: configService.get<string>('database'),
       }),
     }),
-    CaslModule,
     AuthModule,
     UserModule,
     TasksModule,
