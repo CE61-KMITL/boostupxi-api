@@ -2,7 +2,7 @@ import { Type } from '@nestjs/common';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { StatusT } from 'src/shared/interfaces/task.interface';
-import { TestCaseI } from 'src/shared/interfaces/testcase.interface';
+import { ITestCase } from 'src/shared/interfaces/testcase.interface';
 
 @Schema()
 export class Task extends Document {
@@ -28,7 +28,7 @@ export class Task extends Document {
   files: string[];
 
   @Prop({ required: true })
-  testcases: TestCaseI[];
+  testcases: ITestCase[];
 
   @Prop({ default: true })
   draft: boolean;

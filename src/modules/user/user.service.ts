@@ -1,7 +1,7 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+  import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { UserI } from '../../shared/interfaces/user.interface';
+import { IUser } from '../../shared/interfaces/user.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schemas/user.schema';
 import { Model } from 'mongoose';
@@ -9,10 +9,10 @@ import { Model } from 'mongoose';
 @Injectable()
 export class UserService {
   constructor(
-    @InjectModel(User.name) private readonly userModel: Model<UserI>,
+    @InjectModel(User.name) private readonly userModel: Model<IUser>,
   ) {}
 
-  async createUser(createUserDto: CreateUserDto): Promise<UserI> {
+  async createUser(createUserDto: CreateUserDto): Promise<IUser> {
     try {
       const newUser = await this.userModel.create(createUserDto);
       return {
@@ -20,13 +20,13 @@ export class UserService {
         email: newUser.email,
         role: newUser.role,
         score: newUser.score,
-      } as UserI;
+      } as IUser;
     } catch (error) {
       throw new HttpException('BAD_REQUEST', HttpStatus.BAD_REQUEST);
     }
   }
 
-  async getUsers(): Promise<UserI[]> {
+  async getUsers(): Promise<IUser[]> {
     const users = await this.userModel
       .find()
       .select('-password -__v')
@@ -34,7 +34,7 @@ export class UserService {
     return users;
   }
 
-  async getUser(id: string): Promise<UserI> {
+  async getUser(id: string): Promise<IUser> {
     const user = await this.userModel
       .findById(id)
       .select('-password -__v')
@@ -45,7 +45,7 @@ export class UserService {
     return user;
   }
 
-  async updateUser(id: string, updateUserDto: UpdateUserDto): Promise<UserI> {
+  async updateUser(id: string, updateUserDto: UpdateUserDto): Promise<IUser> {
     try {
       const user = await this.userModel
         .findByIdAndUpdate(id, updateUserDto, {

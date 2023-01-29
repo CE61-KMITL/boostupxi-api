@@ -1,9 +1,9 @@
 import { Document, Types } from 'mongoose';
-import { TestCaseI } from './testcase.interface';
+import { ITestCase } from './testcase.interface';
 
 export type StatusT = 'queue' | 'approve' | 'reject';
 
-export interface TaskI extends Document {
+export interface ITask extends Document {
   title: string;
   description: string;
   author: Types.ObjectId;
@@ -11,7 +11,7 @@ export interface TaskI extends Document {
   tags: string[];
   hint: string;
   files: string[];
-  testcases: TestCaseI[];
+  testcases: ITestCase[];
   draft: boolean;
   status: StatusT;
 }

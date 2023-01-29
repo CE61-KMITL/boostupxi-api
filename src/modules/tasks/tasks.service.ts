@@ -4,15 +4,15 @@ import { UpdateTaskDto } from './dto/update-task.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Task } from './schemas/task.schema';
-import { TaskI } from 'src/shared/interfaces/task.interface';
+import { ITask } from 'src/shared/interfaces/task.interface';
 
 @Injectable()
 export class TasksService {
   constructor(
-    @InjectModel(Task.name) private readonly taskModel: Model<TaskI>,
+    @InjectModel(Task.name) private readonly taskModel: Model<ITask>,
   ) {}
 
-  async createTask(createTaskDto: CreateTaskDto): Promise<TaskI> {
+  async createTask(createTaskDto: CreateTaskDto): Promise<ITask> {
     try {
       return await this.taskModel.create(createTaskDto);
     } catch (error) {
@@ -20,14 +20,14 @@ export class TasksService {
     }
   }
 
-  async getTasks(): Promise<TaskI[]> {
+  async getTasks(): Promise<ITask[]> {
     return await this.taskModel
       .find()
       .select('-description -hint -files -testcases -draft')
       .exec();
   }
 
-  async getTask(id: string): Promise<TaskI> {
+  async getTask(id: string): Promise<ITask> {
     return await this.taskModel.findById(id).exec();
   }
 

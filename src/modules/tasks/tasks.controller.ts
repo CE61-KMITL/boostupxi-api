@@ -10,24 +10,24 @@ import {
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
-import { TaskI } from 'src/shared/interfaces/task.interface';
+import { ITask } from 'src/shared/interfaces/task.interface';
 
 @Controller('tasks')
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
   @Post()
-  async createTask(@Body() createTaskDto: CreateTaskDto) : Promise<TaskI> {
+  async createTask(@Body() createTaskDto: CreateTaskDto) : Promise<ITask> {
     return await this.tasksService.createTask(createTaskDto);
   }
 
   @Get()
-  async getTasks(): Promise<TaskI[]> {
+  async getTasks(): Promise<ITask[]> {
     return await this.tasksService.getTasks();
   }
 
   @Get(':id')
-  async getTask(@Param('id') id: string): Promise<TaskI> {
+  async getTask(@Param('id') id: string): Promise<ITask> {
     return await this.tasksService.getTask(id);
   }
 

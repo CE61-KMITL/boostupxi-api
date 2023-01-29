@@ -3,7 +3,7 @@ import { LoginDto } from './dto/login.dto';
 import { CreateUserDto } from 'src/modules/user/dto/create-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { Model } from 'mongoose';
-import { UserI } from 'src/shared/interfaces/user.interface';
+import { IUser } from 'src/shared/interfaces/user.interface';
 import { User } from 'src/modules/user/schemas/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import * as Bcrypt from 'bcryptjs';
@@ -11,7 +11,7 @@ import * as Bcrypt from 'bcryptjs';
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectModel(User.name) private readonly userModel: Model<UserI>,
+    @InjectModel(User.name) private readonly userModel: Model<IUser>,
     private jwtService: JwtService,
   ) {}
 
@@ -35,22 +35,5 @@ export class AuthService {
       throw new HttpException('INVALID_CREDENTIALS', HttpStatus.UNAUTHORIZED);
     }
     return this.generateToken(user._id, user.role);
-  }
-
-  async register(createUserDto: CreateUserDto) {
-    try {
-      const salt = Bcrypt.genSaltSync(10);
-      const hashedPassword = Bcrypt.hashSync(createUserDto.password, salt);
-      createUserDto.password = hashedPassword;
-      const newUser = await this.userModel.create(createUserDto);
-      return {
-        username: newUser.username,
-        email: newUser.email,
-        role: newUser.role,
-        score: newUser.score,
-      } as UserI;
-    } catch (error) {
-      throw new HttpException('USER_ALREADY_EXISTS', HttpStatus.CONFLICT);
-    }
   }
 }

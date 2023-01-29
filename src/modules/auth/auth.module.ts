@@ -7,10 +7,10 @@ import { UserModule } from 'src/modules/user/user.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from 'src/modules/user/schemas/user.schema';
+import { CaslAbilityFactory } from '../authorization/factory/casl-ability.factory';
 
 @Module({
   imports: [
-    UserModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
