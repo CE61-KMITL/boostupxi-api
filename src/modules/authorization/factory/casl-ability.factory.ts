@@ -16,7 +16,6 @@ export class CaslAbilityFactory {
       Ability<[Action, Subjects]>
     >(Ability as AbilityClass<AppAbility>);
 
-
     if (user.role === 'auditor') {
       cannot(Action.CREATE, User);
     }
@@ -28,10 +27,11 @@ export class CaslAbilityFactory {
     if (user.role === 'user') {
       cannot(Action.CREATE, User);
     }
-    
+
+    can(Action.READ, User, { _id: user._id });
     cannot(Action.READ, User);
     cannot(Action.DELETE, User, { _id: user._id });
-    
+
     return build({
       detectSubjectType: (item) =>
         item.constructor as ExtractSubjectType<Subjects>,

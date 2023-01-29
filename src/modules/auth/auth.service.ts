@@ -1,6 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { LoginDto } from './dto/login.dto';
-import { CreateUserDto } from 'src/modules/user/dto/create-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { Model } from 'mongoose';
 import { IUser } from 'src/shared/interfaces/user.interface';

@@ -10,7 +10,7 @@ import { CaslAbilityFactory } from '../authorization/factory/casl-ability.factor
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
   ],
   controllers: [UserController],
-  providers: [UserService,CaslAbilityFactory],
+  providers: [UserService, CaslAbilityFactory],
   exports: [UserService],
 })
 export class UserModule {}

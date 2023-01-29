@@ -5,7 +5,7 @@ import {
   MinLength,
   IsNotEmpty,
   IsNumber,
-  Min
+  Min,
 } from 'class-validator';
 
 export class CreateUserDto {

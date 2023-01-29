@@ -32,6 +32,7 @@ export class TasksService {
   }
 
   async updateTask(id: number, updateTaskDto: UpdateTaskDto) {
+    console.log(updateTaskDto);
     return await `This action updates a #${id} task`;
   }
 

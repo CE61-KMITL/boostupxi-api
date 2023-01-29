@@ -1,4 +1,4 @@
-  import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { IUser } from '../../shared/interfaces/user.interface';
@@ -27,10 +27,7 @@ export class UserService {
   }
 
   async getUsers(): Promise<IUser[]> {
-    const users = await this.userModel
-      .find()
-      .select('-password -__v')
-      .exec();
+    const users = await this.userModel.find().select('-password -__v').exec();
     return users;
   }
 

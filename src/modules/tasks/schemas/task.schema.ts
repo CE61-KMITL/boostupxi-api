@@ -1,4 +1,3 @@
-import { Type } from '@nestjs/common';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { StatusT } from 'src/shared/interfaces/task.interface';
@@ -15,7 +14,7 @@ export class Task extends Document {
   @Prop({ required: true })
   author: Types.ObjectId;
 
-  @Prop({ required: true,min: 1,max: 5 })
+  @Prop({ required: true, min: 1, max: 5 })
   level: number;
 
   @Prop({ required: true })
