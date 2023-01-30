@@ -16,13 +16,17 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { IUser } from '../../shared/interfaces/user.interface';
 import { GetUser } from '../../shared/decorators/get-user.decorator';
 import { JwtGuard } from 'src/shared/guards/jwt.guard';
+import { PoliciesGuard } from 'src/shared/guards/policies.guard';
+import { CheckPolicies } from 'src/shared/decorators/check-policies.decorator';
+import { CreateUserPolicyHandler, DeleteUserPolicyHandler } from '../authorization/policy-handler/user-policy.handler';
 
-@UseGuards(JwtGuard)
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
-
+  
   @Post()
+  @UseGuards(JwtGuard, PoliciesGuard)
+  @CheckPolicies(new CreateUserPolicyHandler())
   async createUser(@Body() createUserDto: CreateUserDto): Promise<IUser> {
     return await this.userService.createUser(createUserDto);
   }
@@ -56,6 +60,8 @@ export class UserController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtGuard, PoliciesGuard)
+  @CheckPolicies(new DeleteUserPolicyHandler())
   async deleteUser(@Param('id') id: string) {
     return await this.userService.deleteUser(id);
   }
