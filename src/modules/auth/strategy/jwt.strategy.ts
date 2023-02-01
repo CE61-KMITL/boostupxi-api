@@ -6,6 +6,7 @@ import { Model } from 'mongoose';
 import { Strategy, ExtractJwt } from 'passport-jwt';
 import { IUser } from 'src/shared/interfaces/user.interface';
 import { User } from 'src/modules/user/schemas/user.schema';
+import { IJwtPayload } from '../interfaces/jwt.interface';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -19,7 +20,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: { sub: string; role: string }): Promise<IUser> {
+  async validate(payload: IJwtPayload): Promise<IUser> {
     const user = await this.userModel.findOne({ _id: payload.sub });
     if (!user) {
       throw new UnauthorizedException();
