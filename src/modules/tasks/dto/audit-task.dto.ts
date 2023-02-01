@@ -1,12 +1,12 @@
-import { IsBoolean, IsNotEmpty, IsString } from 'class-validator';
+import { IsBoolean, IsEnum } from 'class-validator';
 import { TStatus } from 'src/shared/interfaces/task.interface';
+import { TaskStatus } from '../enum/task-status.enum';
+
 
 export class AuditTaskDto {
-  @IsNotEmpty()
-  @IsString()
+  @IsEnum(TaskStatus)
   status: TStatus;
 
-  @IsNotEmpty()
   @IsBoolean()
   draft: boolean;
 }

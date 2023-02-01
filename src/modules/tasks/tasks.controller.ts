@@ -4,6 +4,7 @@ import {
   Body,
   UseGuards,
   Get,
+  Patch,
   Param,
   Delete,
 } from '@nestjs/common';
@@ -14,7 +15,9 @@ import { JwtGuard } from 'src/shared/guards/jwt.guard';
 import { RolesGuard } from 'src/shared/guards/roles.guard';
 import { ITask } from 'src/shared/interfaces/task.interface';
 import { IUser } from 'src/shared/interfaces/user.interface';
+import { AuditTaskDto } from './dto/audit-task.dto';
 import { CreateTaskDto } from './dto/create-task.dto';
+import { UpdateTaskDto } from './dto/update-task.dto';
 import { TasksService } from './tasks.service';
 
 @Controller('tasks')
@@ -38,6 +41,27 @@ export class TasksController {
     return await this.tasksService.getTasks();
   }
 
+  @Patch(':id')
+  @Roles(Role.STAFF, Role.AUDITOR)
+  @UseGuards(JwtGuard, RolesGuard)
+  async updateTaskById(
+    @Param('id') id: string,
+    @GetUser() user: IUser,
+    @Body() updateTaskDto: UpdateTaskDto,
+  ) {
+    return await this.tasksService.updateTaskById(id, user, updateTaskDto);
+  }
+
+  @Patch('audit/:id')
+  @Roles(Role.AUDITOR)
+  @UseGuards(JwtGuard, RolesGuard)
+  async updateAuditTaskById(
+    @Param('id') id: string,
+    @Body() auditTaskDto: AuditTaskDto,
+  ): Promise<ITask> {
+    return await this.tasksService.updateAuditTaskById(id, auditTaskDto);
+  }
+
   @Get(':id')
   @Roles(Role.STAFF, Role.AUDITOR)
   @UseGuards(JwtGuard, RolesGuard)
@@ -49,6 +73,6 @@ export class TasksController {
   @Roles(Role.STAFF, Role.AUDITOR)
   @UseGuards(JwtGuard, RolesGuard)
   async deleteTaskById(@Param('id') id: string, @GetUser() user: IUser) {
-    return await this.tasksService.deleteTaskById(id, user.role, user._id);
+    return await this.tasksService.deleteTaskById(id, user);
   }
 }
