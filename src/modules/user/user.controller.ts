@@ -1,6 +1,8 @@
-import { Controller, Get, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { JwtGuard } from 'src/shared/guards/jwt.guard';
+import { IUser } from 'src/shared/interfaces/user.interface';
+import { GetUser } from 'src/shared/decorators/get-user.decorator';
 
 @Controller('user')
 export class UserController {
@@ -8,7 +10,7 @@ export class UserController {
 
   @Get('/profile')
   @UseGuards(JwtGuard)
-  async getProfile(@Req() req) {
-    return req.user;
+  getProfile(@GetUser() user: IUser): IUser {
+    return user;
   }
 }

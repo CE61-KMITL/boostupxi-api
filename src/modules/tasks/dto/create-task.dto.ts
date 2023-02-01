@@ -7,9 +7,8 @@ import {
   IsArray,
   IsBoolean,
 } from 'class-validator';
-import { Types } from 'mongoose';
 import { ITestCase } from 'src/shared/interfaces/testcase.interface';
-import { StatusT } from 'src/shared/interfaces/task.interface';
+import { TStatus } from 'src/shared/interfaces/task.interface';
 
 export class CreateTaskDto {
   @IsNotEmpty()
@@ -19,10 +18,6 @@ export class CreateTaskDto {
   @IsNotEmpty()
   @IsString()
   description: string;
-
-  @IsNotEmpty()
-  @IsString()
-  author: Types.ObjectId;
 
   @IsNotEmpty()
   @IsNumber()
@@ -51,6 +46,6 @@ export class CreateTaskDto {
   draft: boolean;
 
   @IsNotEmpty()
-  @IsBoolean()
-  status: StatusT;
+  @IsString()
+  status: TStatus;
 }

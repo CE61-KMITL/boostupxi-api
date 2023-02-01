@@ -1,11 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import { StatusT } from 'src/shared/interfaces/task.interface';
+import { TStatus } from 'src/shared/interfaces/task.interface';
 import { ITestCase } from 'src/shared/interfaces/testcase.interface';
 
 @Schema()
 export class Task extends Document {
-  @Prop({ required: true })
+  @Prop({ required: true, unique: true })
   title: string;
 
   @Prop({ required: true })
@@ -33,7 +33,7 @@ export class Task extends Document {
   draft: boolean;
 
   @Prop({ default: 'queue' })
-  status: StatusT;
+  status: TStatus;
 }
 
 export const TaskSchema = SchemaFactory.createForClass(Task);

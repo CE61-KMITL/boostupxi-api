@@ -7,6 +7,7 @@ import { IUser } from 'src/shared/interfaces/user.interface';
 import { User } from '../user/schemas/user.schema';
 import { LoginDto } from './dto/login.dto';
 import * as Bcrypt from 'bcryptjs';
+import { IToken } from './interfaces/jwt.interface';
 
 @Injectable()
 export class AuthService {
@@ -15,14 +16,14 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async generateToken(userId: string, role: string) {
+  generateToken({ userId, role }: { userId: string; role: string }): IToken {
     const payload = { sub: userId, role };
     return {
       token: this.jwtService.sign(payload),
     };
   }
 
-  async login(loginDto: LoginDto) {
+  async login(loginDto: LoginDto): Promise<IToken> {
     const user = await this.userModel.findOne({ email: loginDto.email });
 
     if (!user) {
@@ -38,6 +39,6 @@ export class AuthService {
       throw new HttpException('INVALID_CREDENTIALS', HttpStatus.UNAUTHORIZED);
     }
 
-    return this.generateToken(user._id, user.role);
+    return this.generateToken({ userId: user._id, role: user.role });
   }
 }

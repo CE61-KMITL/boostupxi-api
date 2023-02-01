@@ -1,7 +1,7 @@
 import { Document, Types } from 'mongoose';
 import { ITestCase } from './testcase.interface';
 
-export type StatusT = 'queue' | 'approve' | 'reject';
+export type TStatus = 'queue' | 'approve' | 'reject';
 
 export interface ITask extends Document {
   title: string;
@@ -13,5 +13,5 @@ export interface ITask extends Document {
   files: string[];
   testcases: ITestCase[];
   draft: boolean;
-  status: StatusT;
+  status: TStatus;
 }
