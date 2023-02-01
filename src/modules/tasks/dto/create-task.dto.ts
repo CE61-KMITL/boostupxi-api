@@ -1,10 +1,4 @@
-import {
-  IsString,
-  Min,
-  Max,
-  IsNumber,
-  IsArray,
-} from 'class-validator';
+import { IsString, Min, Max, IsNumber, IsArray } from 'class-validator';
 import { ITestCase } from 'src/shared/interfaces/testcase.interface';
 
 export class CreateTaskDto {
