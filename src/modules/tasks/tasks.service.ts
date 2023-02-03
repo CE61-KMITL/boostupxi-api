@@ -5,27 +5,41 @@ import { Task } from './schemas/task.schema';
 import { ITask } from 'src/shared/interfaces/task.interface';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { Role } from 'src/shared/enums/role.enum';
-import { AuditTaskDto } from './dto/audit-task.dto';
+import { UpdateAuditTaskDto } from './dto/update-audit-task.dto';
 import { IUser } from 'src/shared/interfaces/user.interface';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { AwsService } from '../aws/aws.service';
 
 @Injectable()
 export class TasksService {
   constructor(
     @InjectModel(Task.name) private readonly taskModel: Model<ITask>,
+    private awsService: AwsService,
   ) {}
 
   async createTask(
     createTaskDto: CreateTaskDto,
     user_id: string,
+    files: Array<Express.Multer.File>,
   ): Promise<ITask> {
     try {
+      const uploadFiles = await this.awsService.uploadFiles(files);
+
+      const uploadFilesUrl = uploadFiles.map((file) => {
+        return {
+          url: file.Location,
+          key: file.Key,
+        };
+      });
+
       const task = await this.taskModel.create({
         ...createTaskDto,
         author: user_id,
+        files: uploadFilesUrl,
       });
       return task;
     } catch (error) {
+      console.log(error);
       throw new HttpException('BAD_REQUEST', HttpStatus.BAD_REQUEST);
     }
   }
@@ -76,7 +90,7 @@ export class TasksService {
 
   async updateAuditTaskById(
     id: string,
-    auditTaskDto: AuditTaskDto,
+    auditTaskDto: UpdateAuditTaskDto,
   ): Promise<ITask> {
     try {
       const newTask = await this.taskModel.findByIdAndUpdate(id, auditTaskDto, {

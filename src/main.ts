@@ -37,14 +37,16 @@ async function bootstrap() {
     optionsSuccessStatus: 200,
   });
 
-  const config = new DocumentBuilder()
-    .setTitle('CE BoostUp XI')
-    .setDescription('This is a backend for CE BoostUp XI')
-    .build();
+  if (node_env !== 'production') {
+    const config = new DocumentBuilder()
+      .setTitle('CE BOOSTUP XI Documentation')
+      .setDescription('This is the documentation for CE BOOSTUP XI API.')
+      .build();
 
-  const document = SwaggerModule.createDocument(app, config);
+    const document = SwaggerModule.createDocument(app, config);
 
-  SwaggerModule.setup('docs', app, document);
+    SwaggerModule.setup('docs', app, document);
+  }
 
   await app.listen(port);
 }

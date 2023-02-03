@@ -1,4 +1,5 @@
 import { Document, Types } from 'mongoose';
+import { IFile } from './file.interface';
 import { ITestCase } from './testcase.interface';
 
 export type TStatus = 'queue' | 'approve' | 'reject';
@@ -10,7 +11,7 @@ export interface ITask extends Document {
   level: number;
   tags: string[];
   hint: string;
-  files: string[];
+  files: IFile[];
   testcases: ITestCase[];
   draft: boolean;
   status: TStatus;
