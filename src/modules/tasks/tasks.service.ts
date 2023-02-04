@@ -59,30 +59,21 @@ export class TasksService {
   ) {
     try {
       const task = await this.taskModel.findById(taskId);
-      if (task) {
-        if (user.role === Role.AUDITOR) {
-          const updateTask = await this.taskModel.findByIdAndUpdate(
-            taskId,
-            updateTaskDto,
-            {
-              new: true,
-            },
-          );
-          return updateTask;
-        }
-
-        if (user.role === Role.STAFF && task.author.toString() === user._id) {
-          const updateTask = await this.taskModel.findByIdAndUpdate(
-            taskId,
-            updateTaskDto,
-            {
-              new: true,
-            },
-          );
-          return updateTask;
-        }
-        throw new HttpException('FORBIDDEN', HttpStatus.FORBIDDEN);
+      if (
+        task &&
+        (user.role === Role.AUDITOR ||
+          (user.role === Role.STAFF && task.author.toString() === user._id))
+      ) {
+        const updateTask = await this.taskModel.findByIdAndUpdate(
+          taskId,
+          updateTaskDto,
+          {
+            new: true,
+          },
+        );
+        return updateTask;
       }
+      throw new HttpException('NOT_FOUND', HttpStatus.NOT_FOUND);
     } catch (error) {
       throw new HttpException('BAD_REQUEST', HttpStatus.BAD_REQUEST);
     }
@@ -104,17 +95,16 @@ export class TasksService {
 
   async deleteTaskById(taskId: string, user: IUser) {
     const task = await this.taskModel.findById(taskId);
-    if (task) {
-      if (user.role === Role.AUDITOR) {
-        await this.taskModel.findByIdAndDelete(taskId);
-        throw new HttpException('DELETED', HttpStatus.OK);
-      }
-      if (user.role === Role.STAFF && task.author.toString() === user._id) {
-        await this.taskModel.findByIdAndDelete(taskId);
-        throw new HttpException('DELETED', HttpStatus.OK);
-      }
-      throw new HttpException('FORBIDDEN', HttpStatus.FORBIDDEN);
+    if (
+      task &&
+      (user.role === Role.AUDITOR ||
+        (user.role === Role.STAFF && task.author.toString() === user._id))
+    ) {
+      await this.awsService.deleteFiles(task.files);
+      await this.taskModel.findByIdAndDelete(taskId);
+      throw new HttpException('DELETED', HttpStatus.OK);
     }
+
     throw new HttpException('NOT_FOUND', HttpStatus.NOT_FOUND);
   }
 }

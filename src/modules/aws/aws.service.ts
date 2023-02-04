@@ -22,4 +22,15 @@ export class AwsService {
     });
     return Promise.all(promises);
   }
+
+  async deleteFiles(files: Array<{ key: string }>) {
+    const promises = files.map((file) => {
+      const params = {
+        Bucket: this.configService.get<string>('aws.bucket'),
+        Key: file.key,
+      };
+      return this.s3.deleteObject(params).promise();
+    });
+    return Promise.all(promises);
+  }
 }
