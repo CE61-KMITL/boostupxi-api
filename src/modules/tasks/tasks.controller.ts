@@ -7,6 +7,8 @@ import {
   Patch,
   Param,
   Delete,
+  UseInterceptors,
+  UploadedFiles,
 } from '@nestjs/common';
 import { GetUser } from 'src/shared/decorators/get-user.decorator';
 import { Roles } from 'src/shared/decorators/roles.decorator';
@@ -15,11 +17,11 @@ import { JwtGuard } from 'src/shared/guards/jwt.guard';
 import { RolesGuard } from 'src/shared/guards/roles.guard';
 import { ITask } from 'src/shared/interfaces/task.interface';
 import { IUser } from 'src/shared/interfaces/user.interface';
-import { AuditTaskDto } from './dto/audit-task.dto';
+import { UpdateAuditTaskDto } from './dto/update-audit-task.dto';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { TasksService } from './tasks.service';
-
+import { FilesInterceptor } from '@nestjs/platform-express';
 @Controller('tasks')
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
@@ -27,11 +29,14 @@ export class TasksController {
   @Post()
   @Roles(Role.STAFF, Role.AUDITOR)
   @UseGuards(JwtGuard, RolesGuard)
+  @UseInterceptors(FilesInterceptor('files'))
   async createTask(
-    @Body() createTaskDto: CreateTaskDto,
+    @Body('data') createTaskDto,
     @GetUser() user: IUser,
+    @UploadedFiles() files: Array<Express.Multer.File>,
   ): Promise<ITask> {
-    return await this.tasksService.createTask(createTaskDto, user._id);
+    createTaskDto = JSON.parse(createTaskDto) as CreateTaskDto;
+    return await this.tasksService.createTask(createTaskDto, user._id, files);
   }
 
   @Get()
@@ -57,7 +62,7 @@ export class TasksController {
   @UseGuards(JwtGuard, RolesGuard)
   async updateAuditTaskById(
     @Param('id') id: string,
-    @Body() auditTaskDto: AuditTaskDto,
+    @Body() auditTaskDto: UpdateAuditTaskDto,
   ): Promise<ITask> {
     return await this.tasksService.updateAuditTaskById(id, auditTaskDto);
   }

@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './modules/app/app.module';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -17,6 +18,8 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({
       disableErrorMessages: node_env === 'production' ? true : false,
+      whitelist: true,
+      transform: true,
     }),
   );
 
@@ -33,6 +36,17 @@ async function bootstrap() {
     methods: ['GET', 'POST', 'PATCH', 'DELETE'],
     optionsSuccessStatus: 200,
   });
+
+  if (node_env !== 'production') {
+    const config = new DocumentBuilder()
+      .setTitle('CE BOOSTUP XI Documentation')
+      .setDescription('This is the documentation for CE BOOSTUP XI API.')
+      .build();
+
+    const document = SwaggerModule.createDocument(app, config);
+
+    SwaggerModule.setup('docs', app, document);
+  }
 
   await app.listen(port);
 }

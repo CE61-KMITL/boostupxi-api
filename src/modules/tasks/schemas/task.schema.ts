@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
+import { IFile } from 'src/shared/interfaces/file.interface';
 import { TStatus } from 'src/shared/interfaces/task.interface';
 import { ITestCase } from 'src/shared/interfaces/testcase.interface';
 
@@ -24,7 +25,7 @@ export class Task extends Document {
   hint: string;
 
   @Prop({ required: true })
-  files: string[];
+  files: IFile[];
 
   @Prop({ required: true })
   testcases: ITestCase[];
