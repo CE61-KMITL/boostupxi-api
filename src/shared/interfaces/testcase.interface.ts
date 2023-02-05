@@ -1,1 +1,5 @@
-export interface TestCaseI {}
+export interface ITestCase {
+  input: string;
+  output: string;
+  published: boolean;
+}
