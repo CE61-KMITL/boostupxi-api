@@ -4,7 +4,7 @@ import { IFile } from 'src/shared/interfaces/file.interface';
 import { TStatus } from 'src/shared/interfaces/task.interface';
 import { ITestCase } from 'src/shared/interfaces/testcase.interface';
 
-@Schema()
+@Schema({ timestamps: true })
 export class Task extends Document {
   @Prop({ required: true, unique: true })
   title: string;
