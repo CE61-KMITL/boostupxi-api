@@ -46,15 +46,30 @@ export class TasksController {
     return await this.tasksService.getTasks();
   }
 
+  @Get(':id')
+  @Roles(Role.STAFF, Role.AUDITOR)
+  @UseGuards(JwtGuard, RolesGuard)
+  async getTaskById(@Param('id') id: string): Promise<ITask> {
+    return await this.tasksService.getTaskById(id);
+  }
+
   @Patch(':id')
   @Roles(Role.STAFF, Role.AUDITOR)
   @UseGuards(JwtGuard, RolesGuard)
+  @UseInterceptors(FilesInterceptor('files'))
   async updateTaskById(
     @Param('id') id: string,
     @GetUser() user: IUser,
-    @Body() updateTaskDto: UpdateTaskDto,
-  ) {
-    return await this.tasksService.updateTaskById(id, user, updateTaskDto);
+    @Body('data') updateTaskDto,
+    @UploadedFiles() files: Array<Express.Multer.File>,
+  ): Promise<ITask> {
+    updateTaskDto = JSON.parse(updateTaskDto) as UpdateTaskDto;
+    return await this.tasksService.updateTaskById(
+      id,
+      user,
+      updateTaskDto,
+      files,
+    );
   }
 
   @Patch('audit/:id')
@@ -65,13 +80,6 @@ export class TasksController {
     @Body() auditTaskDto: UpdateAuditTaskDto,
   ): Promise<ITask> {
     return await this.tasksService.updateAuditTaskById(id, auditTaskDto);
-  }
-
-  @Get(':id')
-  @Roles(Role.STAFF, Role.AUDITOR)
-  @UseGuards(JwtGuard, RolesGuard)
-  async getTaskById(@Param('id') id: string): Promise<ITask> {
-    return await this.tasksService.getTaskById(id);
   }
 
   @Delete(':id')

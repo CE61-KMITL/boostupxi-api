@@ -39,7 +39,6 @@ export class TasksService {
       });
       return task;
     } catch (error) {
-      console.log(error);
       throw new HttpException('BAD_REQUEST', HttpStatus.BAD_REQUEST);
     }
   }
@@ -56,23 +55,42 @@ export class TasksService {
     taskId: string,
     user: IUser,
     updateTaskDto: UpdateTaskDto,
-  ) {
+    files: Array<Express.Multer.File>,
+  ): Promise<ITask> {
     try {
       const task = await this.taskModel.findById(taskId);
+
       if (
         task &&
         (user.role === Role.AUDITOR ||
-          (user.role === Role.STAFF && task.author.toString() === user._id))
+          (user.role === Role.STAFF &&
+            task.author.toString() === user._id.toString()))
       ) {
+        const updateFilesUpload = await this.awsService.updateFiles(
+          task.files,
+          files,
+        );
+
+        const updateFilesUrl = updateFilesUpload.map((file) => {
+          return {
+            url: file.Location,
+            key: file.Key,
+          };
+        });
+
         const updateTask = await this.taskModel.findByIdAndUpdate(
           taskId,
-          updateTaskDto,
+          {
+            ...updateTaskDto,
+            files: updateFilesUrl,
+          },
           {
             new: true,
           },
         );
         return updateTask;
       }
+
       throw new HttpException('NOT_FOUND', HttpStatus.NOT_FOUND);
     } catch (error) {
       throw new HttpException('BAD_REQUEST', HttpStatus.BAD_REQUEST);
@@ -98,13 +116,13 @@ export class TasksService {
     if (
       task &&
       (user.role === Role.AUDITOR ||
-        (user.role === Role.STAFF && task.author.toString() === user._id))
+        (user.role === Role.STAFF &&
+          task.author.toString() === user._id.toString()))
     ) {
       await this.awsService.deleteFiles(task.files);
       await this.taskModel.findByIdAndDelete(taskId);
       throw new HttpException('DELETED', HttpStatus.OK);
     }
-
     throw new HttpException('NOT_FOUND', HttpStatus.NOT_FOUND);
   }
 }
