@@ -1,8 +1,10 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-pnpm run format || (echo "⛔ Format ไม่ผ่าน กิตต้นไม่ให้ Commit งับ" && exit 1)
-pnpm run lint || (echo "⛔ Lint ไม่ผ่าน กิตต้นไม่ให้ Commit งับ" && exit 1)
-pnpm run build || (echo "⛔ Build ไม่ผ่าน กิตต้นไม่ให้ Commit งับ" && exit 1)
+pnpm run format || (echo "⛔ Format Failed" && exit 1)
+pnpm run lint || (echo "⛔ Lint Failed" && exit 1)
+pnpm run build || (echo "⛔ Build Failed" && exit 1)
 
-echo "✅ Format, Lint, Build ผ่าน แต่ว่าเช็ค Commit Message ด้วยนะ"
+git add .
+
+echo "✅ Format, Lint, and Build Passed"
