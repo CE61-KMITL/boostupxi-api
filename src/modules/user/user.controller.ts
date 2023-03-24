@@ -10,7 +10,7 @@ export class UserController {
 
   @Get('/profile')
   @UseGuards(JwtGuard)
-  getProfile(@GetUser() user: UserI): UserI {
-    return user;
+  getProfile(@GetUser() user: UserI) {
+    return this.userService.getProfile(user);
   }
 }
