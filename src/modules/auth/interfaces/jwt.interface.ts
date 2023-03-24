@@ -1,8 +1,8 @@
-export interface IJwtPayload {
+export interface JwtPayloadI {
   sub: string;
   role: string;
 }
 
-export interface IToken {
+export interface TokenI {
   token: string;
 }

@@ -1,8 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import { IFile } from 'src/shared/interfaces/file.interface';
-import { TStatus } from 'src/shared/interfaces/task.interface';
-import { ITestCase } from 'src/shared/interfaces/testcase.interface';
+import { FileI } from 'src/shared/interfaces/file.interface';
+import { StatusT } from 'src/shared/interfaces/task.interface';
+import { TestCaseI } from 'src/shared/interfaces/testcase.interface';
 
 @Schema({ timestamps: true })
 export class Task extends Document {
@@ -25,16 +25,16 @@ export class Task extends Document {
   hint: string;
 
   @Prop({ required: true })
-  files: IFile[];
+  files: FileI[];
 
   @Prop({ required: true })
-  testcases: ITestCase[];
+  testcases: TestCaseI[];
 
   @Prop({ default: true })
   draft: boolean;
 
   @Prop({ default: 'queue' })
-  status: TStatus;
+  status: StatusT;
 }
 
 export const TaskSchema = SchemaFactory.createForClass(Task);

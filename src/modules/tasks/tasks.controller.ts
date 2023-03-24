@@ -16,7 +16,7 @@ import { Role } from 'src/shared/enums/role.enum';
 import { JwtGuard } from 'src/shared/guards/jwt.guard';
 import { RolesGuard } from 'src/shared/guards/roles.guard';
 import { ITask } from 'src/shared/interfaces/task.interface';
-import { IUser } from 'src/shared/interfaces/user.interface';
+import { UserI } from 'src/shared/interfaces/user.interface';
 import { UpdateAuditTaskDto } from './dto/update-audit-task.dto';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
@@ -32,7 +32,7 @@ export class TasksController {
   @UseInterceptors(FilesInterceptor('files'))
   async createTask(
     @Body('data') createTaskDto,
-    @GetUser() user: IUser,
+    @GetUser() user: UserI,
     @UploadedFiles() files: Array<Express.Multer.File>,
   ): Promise<ITask> {
     createTaskDto = JSON.parse(createTaskDto) as CreateTaskDto;
@@ -59,7 +59,7 @@ export class TasksController {
   @UseInterceptors(FilesInterceptor('files'))
   async updateTaskById(
     @Param('id') id: string,
-    @GetUser() user: IUser,
+    @GetUser() user: UserI,
     @Body('data') updateTaskDto,
     @UploadedFiles() files: Array<Express.Multer.File>,
   ): Promise<ITask> {
@@ -85,7 +85,7 @@ export class TasksController {
   @Delete(':id')
   @Roles(Role.STAFF, Role.AUDITOR)
   @UseGuards(JwtGuard, RolesGuard)
-  async deleteTaskById(@Param('id') id: string, @GetUser() user: IUser) {
+  async deleteTaskById(@Param('id') id: string, @GetUser() user: UserI) {
     return await this.tasksService.deleteTaskById(id, user);
   }
 }

@@ -4,15 +4,15 @@ import { InjectModel } from '@nestjs/mongoose';
 import { PassportStrategy } from '@nestjs/passport';
 import { Model } from 'mongoose';
 import { Strategy, ExtractJwt } from 'passport-jwt';
-import { IUser } from 'src/shared/interfaces/user.interface';
+import { UserI } from 'src/shared/interfaces/user.interface';
 import { User } from 'src/modules/user/schemas/user.schema';
-import { IJwtPayload } from '../interfaces/jwt.interface';
+import { JwtPayloadI } from '../interfaces/jwt.interface';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     configService: ConfigService,
-    @InjectModel(User.name) private userModel: Model<IUser>,
+    @InjectModel(User.name) private userModel: Model<UserI>,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -20,7 +20,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: IJwtPayload): Promise<IUser> {
+  async validate(payload: JwtPayloadI): Promise<UserI> {
     const user = await this.userModel.findOne({ _id: payload.sub });
     if (!user) {
       throw new UnauthorizedException();

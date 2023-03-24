@@ -3,27 +3,27 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { IUser } from 'src/shared/interfaces/user.interface';
+import { UserI } from 'src/shared/interfaces/user.interface';
 import { User } from '../user/schemas/user.schema';
 import { LoginDto } from './dto/login.dto';
 import * as Bcrypt from 'bcryptjs';
-import { IToken } from './interfaces/jwt.interface';
+import { TokenI } from './interfaces/jwt.interface';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectModel(User.name) private readonly userModel: Model<IUser>,
+    @InjectModel(User.name) private readonly userModel: Model<UserI>,
     private jwtService: JwtService,
   ) {}
 
-  generateToken({ userId, role }: { userId: string; role: string }): IToken {
+  generateToken({ userId, role }: { userId: string; role: string }): TokenI {
     const payload = { sub: userId, role };
     return {
       token: this.jwtService.sign(payload),
     };
   }
 
-  async login(loginDto: LoginDto): Promise<IToken> {
+  async login(loginDto: LoginDto): Promise<TokenI> {
     const user = await this.userModel.findOne({ email: loginDto.email });
 
     if (!user) {

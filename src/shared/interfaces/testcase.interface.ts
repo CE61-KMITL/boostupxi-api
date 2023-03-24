@@ -1,4 +1,4 @@
-export interface ITestCase {
+export interface TestCaseI {
   input: string;
   output: string;
   published: boolean;
