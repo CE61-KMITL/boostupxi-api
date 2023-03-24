@@ -9,4 +9,13 @@ export class UserService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<UserI>,
   ) {}
+
+  getProfile(user: UserI) {
+    return {
+      email: user.email,
+      username: user.username,
+      score: user.score,
+      role: user.role,
+    };
+  }
 }
