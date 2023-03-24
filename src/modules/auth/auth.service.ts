@@ -16,11 +16,9 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  generateToken({ userId, role }: { userId: string; role: string }): TokenI {
+  generateToken({ userId, role }: { userId: string; role: string }): string {
     const payload = { sub: userId, role };
-    return {
-      token: this.jwtService.sign(payload),
-    };
+    return this.jwtService.sign(payload);
   }
 
   async login(loginDto: LoginDto): Promise<TokenI> {
@@ -39,6 +37,14 @@ export class AuthService {
       throw new HttpException('INVALID_CREDENTIALS', HttpStatus.UNAUTHORIZED);
     }
 
-    return this.generateToken({ userId: user._id, role: user.role });
+    const token = this.generateToken({ userId: user._id, role: user.role });
+
+    return {
+      access_token: token,
+    };
+  }
+
+  async logout(): Promise<void> {
+    return;
   }
 }
