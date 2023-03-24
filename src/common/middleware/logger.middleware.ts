@@ -10,7 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 export class LoggerMiddleware implements NestMiddleware {
   private logger = new Logger("HTTP");
 
-  use(request: Request, response: Response, next: NextFunction): void {
+  async use(request: Request, response: Response, next: NextFunction): Promise<void> {
     const { ip, method, originalUrl } = request;
     const userAgent = request.get("user-agent") || "";
     const dateTime = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
