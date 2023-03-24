@@ -125,19 +125,4 @@ export class TasksService {
     }
     throw new HttpException('NOT_FOUND', HttpStatus.NOT_FOUND);
   }
-  async uploadFiles(files: Array<Express.Multer.File>) {
-    try {
-      const uploadFiles = await this.awsService.uploadFiles(files);
-
-      const uploadFilesUrl = uploadFiles.map((file) => {
-        return {
-          url: file.Location,
-          key: file.Key,
-        };
-      });
-      return uploadFilesUrl;
-    } catch (error) {
-      throw new HttpException('BAD_REQUEST', HttpStatus.BAD_REQUEST);
-    }
-  }
 }
