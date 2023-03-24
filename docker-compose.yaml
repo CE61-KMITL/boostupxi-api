@@ -21,9 +21,12 @@ services:
       MONGO_PORT: 27017
       PORT: 3000
       NODE_ENV: development
-      JWT_SECRET: 1234567890
+      JWT_SECRET: 87aaf8c0aab8bb82e0c5318bde62a0d6dc1b9f24d68ae6a127b44826d1e96fc5
       ALLOWED_ORIGINS: http://localhost:3000
       MONGO_URI: mongodb://mongo:27017
+      AWS_BUCKET: masoud
+      AWS_ACCESS_KEY_ID: masoud
+      AWS_SECRET_ACCESS_KEY: Strong#Pass#2022
 
   mongo:
     image: mongo
