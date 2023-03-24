@@ -6,7 +6,7 @@ import {
   IsArray,
   IsNotEmpty,
 } from 'class-validator';
-import { ITestCase } from 'src/shared/interfaces/testcase.interface';
+import { TestCaseI } from 'src/shared/interfaces/testcase.interface';
 
 export class CreateTaskDto {
   @IsString()
@@ -33,5 +33,5 @@ export class CreateTaskDto {
 
   @IsArray()
   @IsNotEmpty()
-  testcases: ITestCase[];
+  testcases: TestCaseI[];
 }

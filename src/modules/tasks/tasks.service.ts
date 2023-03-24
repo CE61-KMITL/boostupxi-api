@@ -6,7 +6,7 @@ import { ITask } from 'src/shared/interfaces/task.interface';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { Role } from 'src/shared/enums/role.enum';
 import { UpdateAuditTaskDto } from './dto/update-audit-task.dto';
-import { IUser } from 'src/shared/interfaces/user.interface';
+import { UserI } from 'src/shared/interfaces/user.interface';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { AwsService } from '../aws/aws.service';
 
@@ -53,7 +53,7 @@ export class TasksService {
 
   async updateTaskById(
     taskId: string,
-    user: IUser,
+    user: UserI,
     updateTaskDto: UpdateTaskDto,
     files: Array<Express.Multer.File>,
   ): Promise<ITask> {
@@ -111,7 +111,7 @@ export class TasksService {
     }
   }
 
-  async deleteTaskById(taskId: string, user: IUser) {
+  async deleteTaskById(taskId: string, user: UserI) {
     const task = await this.taskModel.findById(taskId);
     if (
       task &&
