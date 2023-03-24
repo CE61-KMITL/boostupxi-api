@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Task } from './schemas/task.schema';
@@ -124,5 +124,20 @@ export class TasksService {
       throw new HttpException('DELETED', HttpStatus.OK);
     }
     throw new HttpException('NOT_FOUND', HttpStatus.NOT_FOUND);
+  }
+  async uploadFiles(files: Array<Express.Multer.File>) {
+    try {
+      const uploadFiles = await this.awsService.uploadFiles(files);
+
+      const uploadFilesUrl = uploadFiles.map((file) => {
+        return {
+          url: file.Location,
+          key: file.Key,
+        };
+      });
+      return uploadFilesUrl;
+    } catch (error) {
+      throw new HttpException('BAD_REQUEST', HttpStatus.BAD_REQUEST);
+    }
   }
 }
