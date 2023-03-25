@@ -25,7 +25,7 @@ import { AuthModule } from '../auth/auth.module';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
-        uri: configService.get<string>('database.uri'),
+        uri: configService.get<string>('mongodb.uri'),
       }),
     }),
     AuthModule,
