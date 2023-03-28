@@ -7,4 +7,5 @@ export interface UserI extends Document {
   password: string;
   score: number;
   role: Role;
+  token: string;
 }
