@@ -7,6 +7,7 @@ import { Strategy, ExtractJwt } from 'passport-jwt';
 import { UserI } from 'src/shared/interfaces/user.interface';
 import { User } from 'src/modules/user/schemas/user.schema';
 import { JwtPayloadI } from '../interfaces/jwt.interface';
+import { Request } from 'express';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -21,11 +22,18 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: JwtPayloadI): Promise<UserI> {
+  async validate(req: Request, payload: JwtPayloadI): Promise<UserI> {
+    const token = req.get('Authorization').split(' ')[1];
+
     const user = await this.userModel.findOne({ _id: payload.sub });
     if (!user) {
       throw new UnauthorizedException();
     }
+
+    if (!user.token || user.token !== token) {
+      throw new UnauthorizedException();
+    }
+
     return user;
   }
 }
