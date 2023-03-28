@@ -35,6 +35,9 @@ export class Task extends Document {
 
   @Prop({ default: 'queue' })
   status: StatusT;
+
+  @Prop({ required: true })
+  solution_code: string;
 }
 
 export const TaskSchema = SchemaFactory.createForClass(Task);

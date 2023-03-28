@@ -9,9 +9,6 @@ export class AwsService {
   private s3 = new AWS.S3({
     accessKeyId: this.configService.get<string>('aws.accessKeyId'),
     secretAccessKey: this.configService.get<string>('aws.secretAccessKey'),
-    endpoint: this.configService.get<string>('aws.endpoint'),
-    sslEnabled: false,
-    s3ForcePathStyle: true,
   });
 
   newFileName(originalname: string): string {

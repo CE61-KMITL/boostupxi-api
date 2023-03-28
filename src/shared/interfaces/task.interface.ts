@@ -15,4 +15,5 @@ export interface ITask extends Document {
   testcases: TestCaseI[];
   draft: boolean;
   status: StatusT;
+  solution_code: string;
 }
