@@ -4,10 +4,15 @@ import { TestCaseI } from './testcase.interface';
 
 export type StatusT = 'queue' | 'approve' | 'reject';
 
+export interface AuthorI {
+  id: Types.ObjectId;
+  username: string;
+}
+
 export interface TaskI extends Document {
   title: string;
   description: string;
-  author: Types.ObjectId;
+  author: AuthorI;
   level: number;
   tags: string[];
   hint: string;

@@ -6,6 +6,7 @@ import {
   IsArray,
   IsNotEmpty,
 } from 'class-validator';
+import { FileI } from 'src/shared/interfaces/file.interface';
 import { TestCaseI } from 'src/shared/interfaces/testcase.interface';
 
 export class CreateTaskDto {
@@ -38,4 +39,8 @@ export class CreateTaskDto {
   @IsString()
   @IsNotEmpty()
   solution_code: string;
+
+  @IsArray()
+  @IsNotEmpty()
+  files: FileI[];
 }
