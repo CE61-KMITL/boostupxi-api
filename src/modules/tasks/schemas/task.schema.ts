@@ -3,6 +3,7 @@ import { Document, Types } from 'mongoose';
 import { FileI } from 'src/shared/interfaces/file.interface';
 import { StatusT } from 'src/shared/interfaces/task.interface';
 import { TestCaseI } from 'src/shared/interfaces/testcase.interface';
+import { TaskStatus } from '../enum/task-status.enum';
 
 @Schema({ timestamps: true })
 export class Task extends Document {
@@ -33,8 +34,11 @@ export class Task extends Document {
   @Prop({ default: true })
   draft: boolean;
 
-  @Prop({ default: 'queue' })
+  @Prop({ default: TaskStatus.QUEUE })
   status: StatusT;
+
+  @Prop({ required: true })
+  solution_code: string;
 }
 
 export const TaskSchema = SchemaFactory.createForClass(Task);
