@@ -4,7 +4,7 @@ import { TestCaseI } from './testcase.interface';
 
 export type StatusT = 'queue' | 'approve' | 'reject';
 
-export interface ITask extends Document {
+export interface TaskI extends Document {
   title: string;
   description: string;
   author: Types.ObjectId;

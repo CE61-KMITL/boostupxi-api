@@ -34,4 +34,8 @@ export class CreateTaskDto {
   @IsArray()
   @IsNotEmpty()
   testcases: TestCaseI[];
+
+  @IsString()
+  @IsNotEmpty()
+  solution_code: string;
 }

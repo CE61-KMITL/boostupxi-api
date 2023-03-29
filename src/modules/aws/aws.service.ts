@@ -29,21 +29,22 @@ export class AwsService {
     return Promise.all(promises);
   }
 
-  async updateFiles(
-    oldFiles: Array<{ key: string }>,
-    newFiles: Array<Express.Multer.File>,
-  ) {
-    const promises = newFiles.map((file) => {
-      const params = {
-        Bucket: this.configService.get<string>('aws.bucket'),
-        Key: this.newFileName(file.originalname),
-        Body: file.buffer,
-        ACL: 'public-read',
-      };
-      return this.s3.upload(params).promise();
-    });
-    await this.deleteFiles(oldFiles);
-    return Promise.all(promises);
+  async uploadFile(file: Express.Multer.File) {
+    const params = {
+      Bucket: this.configService.get<string>('aws.bucket'),
+      Key: this.newFileName(file.originalname),
+      Body: file.buffer,
+      ACL: 'public-read',
+    };
+    return this.s3.upload(params).promise();
+  }
+
+  async deleteFile(key: string) {
+    const params = {
+      Bucket: this.configService.get<string>('aws.bucket'),
+      Key: key,
+    };
+    return this.s3.deleteObject(params).promise();
   }
 
   async deleteFiles(files: Array<{ key: string }>) {
