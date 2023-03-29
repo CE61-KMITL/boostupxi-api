@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { UserI } from '../../shared/interfaces/user.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schemas/user.schema';
@@ -11,11 +11,15 @@ export class UserService {
   ) {}
 
   getProfile(user: UserI) {
-    return {
-      email: user.email,
-      username: user.username,
-      score: user.score,
-      role: user.role,
-    };
+    try {
+      return {
+        email: user.email,
+        username: user.username,
+        score: user.score,
+        role: user.role,
+      };
+    } catch (err) {
+      throw new HttpException('BAD_REQUEST', HttpStatus.BAD_REQUEST);
+    }
   }
 }

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import * as AWS from 'aws-sdk';
 import { ConfigService } from '@nestjs/config';
 import { v4 as uuidV4 } from 'uuid';
@@ -17,7 +17,24 @@ export class AwsService {
   }
 
   async uploadFiles(files: Array<Express.Multer.File>) {
-    const promises = files.map((file) => {
+    try {
+      const promises = files.map((file) => {
+        const params = {
+          Bucket: this.configService.get<string>('aws.bucket'),
+          Key: this.newFileName(file.originalname),
+          Body: file.buffer,
+          ACL: 'public-read',
+        };
+        return this.s3.upload(params).promise();
+      });
+      return Promise.all(promises);
+    } catch (err) {
+      throw new HttpException('BAD_REQUEST', HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  async uploadFile(file: Express.Multer.File) {
+    try {
       const params = {
         Bucket: this.configService.get<string>('aws.bucket'),
         Key: this.newFileName(file.originalname),
@@ -25,36 +42,35 @@ export class AwsService {
         ACL: 'public-read',
       };
       return this.s3.upload(params).promise();
-    });
-    return Promise.all(promises);
-  }
-
-  async uploadFile(file: Express.Multer.File) {
-    const params = {
-      Bucket: this.configService.get<string>('aws.bucket'),
-      Key: this.newFileName(file.originalname),
-      Body: file.buffer,
-      ACL: 'public-read',
-    };
-    return this.s3.upload(params).promise();
+    } catch (err) {
+      throw new HttpException('BAD_REQUEST', HttpStatus.BAD_REQUEST);
+    }
   }
 
   async deleteFile(key: string) {
-    const params = {
-      Bucket: this.configService.get<string>('aws.bucket'),
-      Key: key,
-    };
-    return this.s3.deleteObject(params).promise();
+    try {
+      const params = {
+        Bucket: this.configService.get<string>('aws.bucket'),
+        Key: key,
+      };
+      return this.s3.deleteObject(params).promise();
+    } catch (err) {
+      throw new HttpException('BAD_REQUEST', HttpStatus.BAD_REQUEST);
+    }
   }
 
   async deleteFiles(files: Array<{ key: string }>) {
-    const promises = files.map((file) => {
-      const params = {
-        Bucket: this.configService.get<string>('aws.bucket'),
-        Key: file.key,
-      };
-      return this.s3.deleteObject(params).promise();
-    });
-    return Promise.all(promises);
+    try {
+      const promises = files.map((file) => {
+        const params = {
+          Bucket: this.configService.get<string>('aws.bucket'),
+          Key: file.key,
+        };
+        return this.s3.deleteObject(params).promise();
+      });
+      return Promise.all(promises);
+    } catch (err) {
+      throw new HttpException('BAD_REQUEST', HttpStatus.BAD_REQUEST);
+    }
   }
 }
