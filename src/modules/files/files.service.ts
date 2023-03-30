@@ -12,6 +12,7 @@ export class FilesService {
         return {
           key: file.Key,
           url: file.Location,
+          originalName: file.originalname,
         };
       });
     } catch (err) {
@@ -22,9 +23,7 @@ export class FilesService {
   async deleteFiles(keys: { key: string }[]) {
     try {
       await this.awsService.deleteFiles(keys);
-      return {
-        message: 'Files deleted successfully',
-      };
+      throw new HttpException('FILES_DELETED', HttpStatus.OK);
     } catch (err) {
       throw new HttpException('BAD_REQUEST', HttpStatus.BAD_REQUEST);
     }
