@@ -1,9 +1,10 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { FileI } from 'src/shared/interfaces/file.interface';
 import { StatusT } from 'src/shared/interfaces/task.interface';
 import { TestCaseI } from 'src/shared/interfaces/testcase.interface';
 import { TaskStatus } from '../enum/task-status.enum';
+import { AuthorI } from '../../../shared/interfaces/task.interface';
 
 @Schema({ timestamps: true })
 export class Task extends Document {
@@ -13,8 +14,13 @@ export class Task extends Document {
   @Prop({ required: true })
   description: string;
 
-  @Prop({ required: true })
-  author: Types.ObjectId;
+  @Prop(
+    raw({
+      id: { type: Types.ObjectId, ref: 'User', required: true },
+      username: { type: String, required: true },
+    }),
+  )
+  author: AuthorI;
 
   @Prop({ required: true, min: 1, max: 5 })
   level: number;

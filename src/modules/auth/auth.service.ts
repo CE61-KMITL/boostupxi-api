@@ -55,8 +55,6 @@ export class AuthService {
 
     await this.userModel.updateOne({ _id: user._id }, { $set: { token: '' } });
 
-    return {
-      message: 'Logout was successful !',
-    };
+    throw new HttpException('LOGGED_OUT', HttpStatus.OK);
   }
 }

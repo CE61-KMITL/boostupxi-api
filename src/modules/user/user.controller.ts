@@ -1,10 +1,4 @@
-import {
-  Controller,
-  Get,
-  UseGuards,
-  HttpCode,
-  HttpStatus,
-} from '@nestjs/common';
+import { Controller, Get, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { JwtGuard } from 'src/shared/guards/jwt.guard';
 import { UserI } from 'src/shared/interfaces/user.interface';
@@ -16,7 +10,6 @@ export class UserController {
 
   @Get('/profile')
   @UseGuards(JwtGuard)
-  @HttpCode(HttpStatus.OK)
   getProfile(@GetUser() user: UserI) {
     return this.userService.getProfile(user);
   }

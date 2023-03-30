@@ -1,11 +1,11 @@
 import {
   Body,
   Controller,
-  HttpCode,
-  HttpStatus,
   Post,
   UseGuards,
   Res,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { GetUser } from 'src/shared/decorators/get-user.decorator';
@@ -19,19 +19,15 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('login')
-  @HttpCode(HttpStatus.OK)
   async login(@Body() loginDto: LoginDto, @Res() res: Response) {
     const { access_token } = await this.authService.login(loginDto);
     res.set('Authorization', access_token);
 
-    return res.json({
-      message: 'Login was successful !',
-    });
+    throw new HttpException('LOGIN_SUCCESS', HttpStatus.OK);
   }
 
   @Post('logout')
   @UseGuards(JwtGuard)
-  @HttpCode(HttpStatus.OK)
   async logout(@GetUser() user: UserI): Promise<{ message: string }> {
     return await this.authService.logout(user._id);
   }

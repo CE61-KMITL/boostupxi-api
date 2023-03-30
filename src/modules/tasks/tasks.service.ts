@@ -4,124 +4,81 @@ import { Model } from 'mongoose';
 import { Task } from './schemas/task.schema';
 import { TaskI } from 'src/shared/interfaces/task.interface';
 import { CreateTaskDto } from './dto/create-task.dto';
+import { UserI } from '../../shared/interfaces/user.interface';
 import { Role } from 'src/shared/enums/role.enum';
-import { UpdateAuditTaskDto } from './dto/update-audit-task.dto';
-import { UserI } from 'src/shared/interfaces/user.interface';
-import { UpdateTaskDto } from './dto/update-task.dto';
 import { AwsService } from '../aws/aws.service';
-import { FileI } from 'src/shared/interfaces/file.interface';
+import { UpdateTaskDto } from './dto/update-task.dto';
 
 @Injectable()
 export class TasksService {
   constructor(
     @InjectModel(Task.name) private readonly taskModel: Model<TaskI>,
+    private awsService: AwsService,
   ) {}
 
-  // async createTask(
-  //   createTaskDto: CreateTaskDto,
-  //   user_id: string,
-  // ): Promise<ITask> {
-  //   try {
-  //     // const uploadFiles = await this.awsService.uploadFiles(files);
+  async createTask(createTaskDto: CreateTaskDto, user: UserI): Promise<TaskI> {
+    const task = await this.taskModel.findOne({
+      title: createTaskDto.title,
+    });
 
-  //     // const uploadFilesUrl = uploadFiles.map((file) => {
-  //     //   return {
-  //     //     url: file.Location,
-  //     //     key: file.Key,
-  //     //   };
-  //     // });
+    if (task) {
+      throw new HttpException('TASK_EXISTED', HttpStatus.BAD_REQUEST);
+    }
 
-  //     const task = await this.taskModel.create({
-  //       ...createTaskDto,
-  //       author: user_id,
-  //       // files: uploadFilesUrl,
-  //     });
-  //     return task;
-  //   } catch (error) {
-  //     throw new HttpException('BAD_REQUEST', HttpStatus.BAD_REQUEST);
-  //   }
-  // }
+    const newTask = await this.taskModel.create({
+      ...createTaskDto,
+      author: {
+        id: user._id,
+        username: user.username,
+      },
+    });
+    return newTask;
+  }
 
-  // async getTasks(): Promise<ITask[]> {
-  //   return await this.taskModel.find();
-  // }
+  async getTasks(): Promise<TaskI[]> {
+    const tasks = await this.taskModel.find({});
+    return tasks;
+  }
 
-  // async getTaskById(id: string): Promise<ITask> {
-  //   return await this.taskModel.findById(id);
-  // }
+  async getTaskById(id: string): Promise<TaskI> {
+    const task = await this.taskModel.findById(id);
 
-  // async updateTaskById(
-  //   taskId: string,
-  //   user: UserI,
-  //   updateTaskDto: UpdateTaskDto,
-  //   files: Array<Express.Multer.File>,
-  // ): Promise<ITask> {
-  //   try {
-  //     const task = await this.taskModel.findById(taskId);
+    if (!task) {
+      throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
+    }
 
-  //     if (
-  //       task &&
-  //       (user.role === Role.AUDITOR ||
-  //         (user.role === Role.STAFF &&
-  //           task.author.toString() === user._id.toString()))
-  //     ) {
-  //       const updateFilesUpload = await this.awsService.updateFiles(
-  //         task.files,
-  //         files,
-  //       );
+    return task;
+  }
 
-  //       const updateFilesUrl = updateFilesUpload.map((file) => {
-  //         return {
-  //           url: file.Location,
-  //           key: file.Key,
-  //         };
-  //       });
+  async updateTask(id: string, updateTaskDto: UpdateTaskDto) {
+    const task = await this.taskModel.findById(id);
 
-  //       const updateTask = await this.taskModel.findByIdAndUpdate(
-  //         taskId,
-  //         {
-  //           ...updateTaskDto,
-  //           files: updateFilesUrl,
-  //         },
-  //         {
-  //           new: true,
-  //         },
-  //       );
-  //       return updateTask;
-  //     }
+    if (!task) {
+      throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
+    }
 
-  //     throw new HttpException('NOT_FOUND', HttpStatus.NOT_FOUND);
-  //   } catch (error) {
-  //     throw new HttpException('BAD_REQUEST', HttpStatus.BAD_REQUEST);
-  //   }
-  // }
+    const updatedTask = await this.taskModel.findByIdAndUpdate(
+      id,
+      updateTaskDto,
+      { new: true },
+    );
 
-  // async updateAuditTaskById(
-  //   id: string,
-  //   auditTaskDto: UpdateAuditTaskDto,
-  // ): Promise<ITask> {
-  //   try {
-  //     const newTask = await this.taskModel.findByIdAndUpdate(id, auditTaskDto, {
-  //       new: true,
-  //     });
-  //     return newTask;
-  //   } catch (error) {
-  //     throw new HttpException('BAD_REQUEST', HttpStatus.BAD_REQUEST);
-  //   }
-  // }
+    return updatedTask;
+  }
 
-  // async deleteTaskById(taskId: string, user: UserI) {
-  //   const task = await this.taskModel.findById(taskId);
-  //   if (
-  //     task &&
-  //     (user.role === Role.AUDITOR ||
-  //       (user.role === Role.STAFF &&
-  //         task.author.toString() === user._id.toString()))
-  //   ) {
-  //     await this.awsService.deleteFiles(task.files);
-  //     await this.taskModel.findByIdAndDelete(taskId);
-  //     throw new HttpException('DELETED', HttpStatus.OK);
-  //   }
-  //   throw new HttpException('NOT_FOUND', HttpStatus.NOT_FOUND);
-  // }
+  async deleteTask(id: string, user: UserI) {
+    const task = await this.taskModel.findById(id);
+    if (
+      task &&
+      (user.role === Role.AUDITOR ||
+        (user.role === Role.STAFF &&
+          task.author.id.toString() === user._id.toString()))
+    ) {
+      const keys = task.files.map((file) => ({ key: file.key }));
+      await this.awsService.deleteFiles(keys);
+      await task.delete();
+      throw new HttpException('TASK_DELETED', HttpStatus.OK);
+    }
+    throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
+  }
 }
