@@ -11,6 +11,7 @@ export class FileService {
       return {
         key: uploadedFile.Key,
         url: uploadedFile.Location,
+        originalName: uploadedFile.originalname,
       };
     } catch (err) {
       throw new HttpException('BAD_REQUEST', HttpStatus.BAD_REQUEST);
@@ -20,9 +21,7 @@ export class FileService {
   async deleteFile(key: string) {
     try {
       await this.awsService.deleteFile(key);
-      return {
-        message: 'File deleted successfully',
-      };
+      throw new HttpException('FILE_DELETED', HttpStatus.OK);
     } catch (err) {
       throw new HttpException('BAD_REQUEST', HttpStatus.BAD_REQUEST);
     }

@@ -20,6 +20,7 @@ import { CreateTaskDto } from './dto/create-task.dto';
 import { UserI } from '../../shared/interfaces/user.interface';
 import { TaskI } from 'src/shared/interfaces/task.interface';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { UpdateAuditTaskDto } from './dto/update-audit-task.dto';
 
 @Controller('tasks')
 export class TasksController {
@@ -58,6 +59,16 @@ export class TasksController {
     @Body() updateTaskDto: UpdateTaskDto,
   ) {
     return await this.tasksService.updateTask(id, updateTaskDto);
+  }
+
+  @Patch('/audit/:id')
+  @Roles(Role.AUDITOR)
+  @UseGuards(JwtGuard, RolesGuard)
+  async auditTask(
+    @Param('id') id: string,
+    @Body() updateAuditTaskDto: UpdateAuditTaskDto,
+  ) {
+    return await this.tasksService.auditTask(id, updateAuditTaskDto);
   }
 
   @Delete('/:id')

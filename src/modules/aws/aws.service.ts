@@ -18,14 +18,18 @@ export class AwsService {
 
   async uploadFiles(files: Array<Express.Multer.File>) {
     try {
-      const promises = files.map((file) => {
+      const promises = files.map(async (file) => {
         const params = {
           Bucket: this.configService.get<string>('aws.bucket'),
           Key: this.newFileName(file.originalname),
           Body: file.buffer,
           ACL: 'public-read',
         };
-        return this.s3.upload(params).promise();
+        const uploadedFile = await this.s3.upload(params).promise();
+        return {
+          ...uploadedFile,
+          originalname: file.originalname,
+        };
       });
       return Promise.all(promises);
     } catch (err) {
@@ -41,7 +45,11 @@ export class AwsService {
         Body: file.buffer,
         ACL: 'public-read',
       };
-      return this.s3.upload(params).promise();
+      const uploadedFile = await this.s3.upload(params).promise();
+      return {
+        ...uploadedFile,
+        originalname: file.originalname,
+      };
     } catch (err) {
       throw new HttpException('BAD_REQUEST', HttpStatus.BAD_REQUEST);
     }

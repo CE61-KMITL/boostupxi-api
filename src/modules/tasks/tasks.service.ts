@@ -8,6 +8,7 @@ import { UserI } from '../../shared/interfaces/user.interface';
 import { Role } from 'src/shared/enums/role.enum';
 import { AwsService } from '../aws/aws.service';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { UpdateAuditTaskDto } from './dto/update-audit-task.dto';
 
 @Injectable()
 export class TasksService {
@@ -60,6 +61,22 @@ export class TasksService {
     const updatedTask = await this.taskModel.findByIdAndUpdate(
       id,
       updateTaskDto,
+      { new: true },
+    );
+
+    return updatedTask;
+  }
+
+  async auditTask(id: string, updateAuditTaskDto: UpdateAuditTaskDto) {
+    const task = await this.taskModel.findById(id);
+
+    if (!task) {
+      throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
+    }
+
+    const updatedTask = await this.taskModel.findByIdAndUpdate(
+      id,
+      updateAuditTaskDto,
       { new: true },
     );
 
