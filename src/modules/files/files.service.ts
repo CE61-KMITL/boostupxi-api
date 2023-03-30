@@ -8,7 +8,6 @@ export class FilesService {
   async uploadFiles(files: Express.Multer.File[]) {
     try {
       const uploadedFiles = await this.awsService.uploadFiles(files);
-      console.log(uploadedFiles);
       return uploadedFiles.map((file) => {
         return {
           key: file.Key,
