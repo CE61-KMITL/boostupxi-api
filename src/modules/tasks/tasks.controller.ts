@@ -19,15 +19,16 @@ import { TasksService } from '../tasks/tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UserI } from '../../shared/interfaces/user.interface';
 import { TaskI } from 'src/shared/interfaces/task.interface';
+import { UpdateTaskDto } from './dto/update-task.dto';
 
 @Controller('tasks')
+@Roles(Role.AUDITOR, Role.STAFF)
+@UseGuards(JwtGuard, RolesGuard)
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @Roles(Role.AUDITOR, Role.STAFF)
-  @UseGuards(JwtGuard, RolesGuard)
   async createTask(
     @Body() createTaskDto: CreateTaskDto,
     @GetUser() user: UserI,
@@ -41,17 +42,20 @@ export class TasksController {
   }
 
   @Get('/:id')
-  async getTask(@Param('id') id: string) {
-    return await this.tasksService.getTask(id);
+  async getTaskById(@Param('id') id: string): Promise<TaskI> {
+    return await this.tasksService.getTaskById(id);
   }
 
   @Patch('/:id')
-  async updateTask(@Param('id') id: string) {
-    return await this.tasksService.updateTask(id);
+  async updateTask(
+    @Param('id') id: string,
+    @Body() updateTaskDto: UpdateTaskDto,
+  ) {
+    return await this.tasksService.updateTask(id, updateTaskDto);
   }
 
   @Delete('/:id')
-  async deleteTask(@Param('id') id: string) {
-    return await this.tasksService.deleteTask(id);
+  async deleteTask(@Param('id') id: string, @GetUser() user: UserI) {
+    return await this.tasksService.deleteTask(id, user);
   }
 }

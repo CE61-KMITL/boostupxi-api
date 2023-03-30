@@ -1,4 +1,12 @@
-import { Body, Controller, Post, UseGuards, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  UseGuards,
+  Res,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { Response } from 'express';
 import { GetUser } from 'src/shared/decorators/get-user.decorator';
 import { JwtGuard } from 'src/shared/guards/jwt.guard';
@@ -15,9 +23,7 @@ export class AuthController {
     const { access_token } = await this.authService.login(loginDto);
     res.set('Authorization', access_token);
 
-    return res.json({
-      message: 'Login was successful !',
-    });
+    throw new HttpException('LOGIN_SUCCESS', HttpStatus.OK);
   }
 
   @Post('logout')

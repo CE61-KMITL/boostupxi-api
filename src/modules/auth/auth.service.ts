@@ -22,52 +22,39 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto): Promise<TokenI> {
-    try {
-      const user = await this.userModel.findOne({ email: loginDto.email });
+    const user = await this.userModel.findOne({ email: loginDto.email });
 
-      if (!user) {
-        throw new HttpException('USER_NOT_FOUND', HttpStatus.NOT_FOUND);
-      }
-
-      const isPasswordMatching = Bcrypt.compareSync(
-        loginDto.password,
-        user.password,
-      );
-
-      if (!isPasswordMatching) {
-        throw new HttpException('INVALID_CREDENTIALS', HttpStatus.UNAUTHORIZED);
-      }
-
-      const token = this.generateToken({ userId: user._id, role: user.role });
-
-      await this.userModel.updateOne({ _id: user._id }, { $set: { token } });
-
-      return {
-        access_token: token,
-      };
-    } catch (err) {
-      throw new HttpException('BAD_REQUEST', HttpStatus.BAD_REQUEST);
+    if (!user) {
+      throw new HttpException('USER_NOT_FOUND', HttpStatus.NOT_FOUND);
     }
+
+    const isPasswordMatching = Bcrypt.compareSync(
+      loginDto.password,
+      user.password,
+    );
+
+    if (!isPasswordMatching) {
+      throw new HttpException('INVALID_CREDENTIALS', HttpStatus.UNAUTHORIZED);
+    }
+
+    const token = this.generateToken({ userId: user._id, role: user.role });
+
+    await this.userModel.updateOne({ _id: user._id }, { $set: { token } });
+
+    return {
+      access_token: token,
+    };
   }
 
   async logout(id: string): Promise<{ message: string }> {
-    try {
-      const user = await this.userModel.findOne({ _id: id });
+    const user = await this.userModel.findOne({ _id: id });
 
-      if (!user) {
-        throw new HttpException('USER_NOT_FOUND', HttpStatus.NOT_FOUND);
-      }
-
-      await this.userModel.updateOne(
-        { _id: user._id },
-        { $set: { token: '' } },
-      );
-
-      return {
-        message: 'Logout was successful !',
-      };
-    } catch (err) {
-      throw new HttpException('BAD_REQUEST', HttpStatus.BAD_REQUEST);
+    if (!user) {
+      throw new HttpException('USER_NOT_FOUND', HttpStatus.NOT_FOUND);
     }
+
+    await this.userModel.updateOne({ _id: user._id }, { $set: { token: '' } });
+
+    throw new HttpException('LOGGED_OUT', HttpStatus.OK);
   }
 }
