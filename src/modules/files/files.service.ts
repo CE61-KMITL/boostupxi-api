@@ -12,7 +12,6 @@ export class FilesService {
         return {
           key: file.Key,
           url: file.Location,
-          originalName: file.originalname,
         };
       });
     } catch (err) {

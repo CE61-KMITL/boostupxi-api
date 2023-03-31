@@ -23,14 +23,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(req: Request, payload: JwtPayloadI): Promise<UserI> {
-    const token = req.get('Authorization').split(' ')[1];
-
     const user = await this.userModel.findOne({ _id: payload.sub });
     if (!user) {
-      throw new UnauthorizedException();
-    }
-
-    if (!user.token || user.token !== token) {
       throw new UnauthorizedException();
     }
 
