@@ -6,25 +6,17 @@ export class FilesService {
   constructor(private awsService: AwsService) {}
 
   async uploadFiles(files: Express.Multer.File[]) {
-    try {
-      const uploadedFiles = await this.awsService.uploadFiles(files);
-      return uploadedFiles.map((file) => {
-        return {
-          key: file.Key,
-          url: file.Location,
-        };
-      });
-    } catch (err) {
-      throw new HttpException('BAD_REQUEST', HttpStatus.BAD_REQUEST);
-    }
+    const uploadedFiles = await this.awsService.uploadFiles(files);
+    return uploadedFiles.map((file) => {
+      return {
+        key: file.Key,
+        url: file.Location,
+      };
+    });
   }
 
   async deleteFiles(keys: { key: string }[]) {
-    try {
-      await this.awsService.deleteFiles(keys);
-      throw new HttpException('FILES_DELETED', HttpStatus.OK);
-    } catch (err) {
-      throw new HttpException('BAD_REQUEST', HttpStatus.BAD_REQUEST);
-    }
+    await this.awsService.deleteFiles(keys);
+    throw new HttpException('FILES_DELETED', HttpStatus.OK);
   }
 }
