@@ -13,7 +13,11 @@ export class AwsService {
   newFileName(originalname: string): string {
     const originalFileName = originalname.split('.')[0];
     const extension = originalname.split('.').pop();
-    return `${originalFileName}~${Date.now()}.${extension}`;
+
+    const newDate = new Date();
+    newDate.setHours(newDate.getHours() + 7);
+
+    return `${originalFileName}~${newDate.toISOString()}.${extension}`;
   }
 
   async uploadFiles(files: Array<Express.Multer.File>) {
