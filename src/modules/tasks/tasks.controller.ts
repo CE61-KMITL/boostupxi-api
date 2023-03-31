@@ -74,6 +74,7 @@ export class TasksController {
   }
 
   @Get('/user/:id')
+  @ApiSecurity('JWT-auth')
   @Roles(Role.AUDITOR, Role.STAFF, Role.USER)
   @UseGuards(JwtGuard, RolesGuard)
   async getTasksByUser(@Param('id') id: string): Promise<TaskI[]> {
