@@ -7,7 +7,7 @@ import { UserI } from 'src/shared/interfaces/user.interface';
 import { User } from '../user/schemas/user.schema';
 import { LoginDto } from './dto/login.dto';
 import * as Bcrypt from 'bcryptjs';
-import { TokenI } from './interfaces/jwt.interface';
+import { Response } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -21,7 +21,7 @@ export class AuthService {
     return this.jwtService.sign(payload);
   }
 
-  async login(loginDto: LoginDto): Promise<TokenI> {
+  async login(loginDto: LoginDto, res: Response) {
     const user = await this.userModel.findOne({ email: loginDto.email });
 
     if (!user) {
@@ -39,22 +39,7 @@ export class AuthService {
 
     const token = this.generateToken({ userId: user._id, role: user.role });
 
-    await this.userModel.updateOne({ _id: user._id }, { $set: { token } });
-
-    return {
-      access_token: token,
-    };
-  }
-
-  async logout(id: string): Promise<{ message: string }> {
-    const user = await this.userModel.findOne({ _id: id });
-
-    if (!user) {
-      throw new HttpException('USER_NOT_FOUND', HttpStatus.NOT_FOUND);
-    }
-
-    await this.userModel.updateOne({ _id: user._id }, { $set: { token: '' } });
-
-    throw new HttpException('LOGGED_OUT', HttpStatus.OK);
+    res.set('Authorization', token);
+    throw new HttpException('LOGIN_SUCCESS', HttpStatus.OK);
   }
 }

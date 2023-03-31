@@ -33,7 +33,7 @@ export class TasksController {
   async createTask(
     @Body() createTaskDto: CreateTaskDto,
     @GetUser() user: UserI,
-  ): Promise<TaskI> {
+  ) {
     return await this.tasksService.createTask(createTaskDto, user);
   }
 

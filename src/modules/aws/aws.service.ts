@@ -1,7 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import * as AWS from 'aws-sdk';
 import { ConfigService } from '@nestjs/config';
-import { v4 as uuidV4 } from 'uuid';
 
 @Injectable()
 export class AwsService {
@@ -12,8 +11,13 @@ export class AwsService {
   });
 
   newFileName(originalname: string): string {
+    const originalFileName = originalname.split('.')[0];
     const extension = originalname.split('.').pop();
-    return `${uuidV4()}.${extension}`;
+
+    const newDate = new Date();
+    newDate.setHours(newDate.getHours() + 7);
+
+    return `${originalFileName}~${newDate.toISOString()}.${extension}`;
   }
 
   async uploadFiles(files: Array<Express.Multer.File>) {
@@ -26,42 +30,9 @@ export class AwsService {
           ACL: 'public-read',
         };
         const uploadedFile = await this.s3.upload(params).promise();
-        return {
-          ...uploadedFile,
-          originalname: file.originalname,
-        };
+        return uploadedFile;
       });
       return Promise.all(promises);
-    } catch (err) {
-      throw new HttpException('BAD_REQUEST', HttpStatus.BAD_REQUEST);
-    }
-  }
-
-  async uploadFile(file: Express.Multer.File) {
-    try {
-      const params = {
-        Bucket: this.configService.get<string>('aws.bucket'),
-        Key: this.newFileName(file.originalname),
-        Body: file.buffer,
-        ACL: 'public-read',
-      };
-      const uploadedFile = await this.s3.upload(params).promise();
-      return {
-        ...uploadedFile,
-        originalname: file.originalname,
-      };
-    } catch (err) {
-      throw new HttpException('BAD_REQUEST', HttpStatus.BAD_REQUEST);
-    }
-  }
-
-  async deleteFile(key: string) {
-    try {
-      const params = {
-        Bucket: this.configService.get<string>('aws.bucket'),
-        Key: key,
-      };
-      return this.s3.deleteObject(params).promise();
     } catch (err) {
       throw new HttpException('BAD_REQUEST', HttpStatus.BAD_REQUEST);
     }

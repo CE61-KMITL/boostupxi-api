@@ -10,12 +10,10 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import configuration from 'src/config/configuration';
 import { LoggerMiddleware } from 'src/common/middleware/logger.middleware';
 import { MongooseModule } from '@nestjs/mongoose';
-
 import { UserModule } from '../user/user.module';
 import { TasksModule } from '../tasks/tasks.module';
 import { AuthModule } from '../auth/auth.module';
 import { FilesModule } from '../files/files.module';
-import { FileModule } from '../file/file.module';
 
 @Module({
   imports: [
@@ -34,7 +32,6 @@ import { FileModule } from '../file/file.module';
     UserModule,
     TasksModule,
     FilesModule,
-    FileModule,
   ],
   controllers: [AppController],
   providers: [AppService],
