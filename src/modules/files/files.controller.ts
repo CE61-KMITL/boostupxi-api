@@ -13,12 +13,14 @@ import { Role } from 'src/shared/enums/role.enum';
 import { JwtGuard } from 'src/shared/guards/jwt.guard';
 import { RolesGuard } from 'src/shared/guards/roles.guard';
 import { FilesService } from './files.service';
+import { ApiSecurity } from '@nestjs/swagger';
 
 @Controller('files')
 export class FilesController {
   constructor(private readonly filesService: FilesService) {}
 
   @Post()
+  @ApiSecurity('JWT-auth')
   @Roles(Role.AUDITOR, Role.STAFF)
   @UseGuards(JwtGuard, RolesGuard)
   @UseInterceptors(FilesInterceptor('files'))
@@ -27,6 +29,7 @@ export class FilesController {
   }
 
   @Delete()
+  @ApiSecurity('JWT-auth')
   @Roles(Role.AUDITOR, Role.STAFF)
   @UseGuards(JwtGuard, RolesGuard)
   async deleteFiles(@Body() keys: { key: string }[]) {

@@ -21,12 +21,15 @@ import { UserI } from '../../shared/interfaces/user.interface';
 import { TaskI } from 'src/shared/interfaces/task.interface';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { UpdateAuditTaskDto } from './dto/update-audit-task.dto';
+import { ApiSecurity, ApiTags } from '@nestjs/swagger';
 
 @Controller('tasks')
+@ApiTags('Tasks')
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
   @Post()
+  @ApiSecurity('JWT-auth')
   @HttpCode(HttpStatus.CREATED)
   @Roles(Role.AUDITOR, Role.STAFF)
   @UseGuards(JwtGuard, RolesGuard)
@@ -38,6 +41,7 @@ export class TasksController {
   }
 
   @Get()
+  @ApiSecurity('JWT-auth')
   @Roles(Role.AUDITOR, Role.STAFF, Role.USER)
   @UseGuards(JwtGuard, RolesGuard)
   async getTasks(): Promise<TaskI[]> {
@@ -45,6 +49,7 @@ export class TasksController {
   }
 
   @Get('/:id')
+  @ApiSecurity('JWT-auth')
   @Roles(Role.AUDITOR, Role.STAFF, Role.USER)
   @UseGuards(JwtGuard, RolesGuard)
   async getTaskById(@Param('id') id: string): Promise<TaskI> {
@@ -52,6 +57,7 @@ export class TasksController {
   }
 
   @Patch('/:id')
+  @ApiSecurity('JWT-auth')
   @Roles(Role.AUDITOR, Role.STAFF)
   @UseGuards(JwtGuard, RolesGuard)
   async updateTask(
@@ -62,6 +68,7 @@ export class TasksController {
   }
 
   @Patch('/audit/:id')
+  @ApiSecurity('JWT-auth')
   @Roles(Role.AUDITOR)
   @UseGuards(JwtGuard, RolesGuard)
   async auditTask(
@@ -72,6 +79,7 @@ export class TasksController {
   }
 
   @Delete('/:id')
+  @ApiSecurity('JWT-auth')
   @Roles(Role.AUDITOR, Role.STAFF)
   @UseGuards(JwtGuard, RolesGuard)
   async deleteTask(@Param('id') id: string, @GetUser() user: UserI) {
