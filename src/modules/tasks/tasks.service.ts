@@ -36,8 +36,12 @@ export class TasksService {
     return newTask;
   }
 
-  async getTasks(): Promise<TaskI[]> {
-    const tasks = await this.taskModel.find({});
+  async getTasks(page = 1, limit = 25): Promise<TaskI[]> {
+    const tasks = await this.taskModel
+      .find()
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .exec();
     return tasks;
   }
 
@@ -49,6 +53,13 @@ export class TasksService {
     }
 
     return task;
+  }
+
+  async getTasksByUser(id: string): Promise<TaskI[]> {
+    const tasks = await this.taskModel.find({
+      'author.id': id,
+    });
+    return tasks;
   }
 
   async updateTask(id: string, updateTaskDto: UpdateTaskDto) {

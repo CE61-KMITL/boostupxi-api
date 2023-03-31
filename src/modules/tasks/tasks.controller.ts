@@ -6,8 +6,10 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { GetUser } from 'src/shared/decorators/get-user.decorator';
@@ -40,8 +42,23 @@ export class TasksController {
   @Get()
   @Roles(Role.AUDITOR, Role.STAFF, Role.USER)
   @UseGuards(JwtGuard, RolesGuard)
-  async getTasks(): Promise<TaskI[]> {
-    return await this.tasksService.getTasks();
+  async getTasks(
+    @Query(
+      'page',
+      new ParseIntPipe({
+        errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE,
+      }),
+    )
+    page: number,
+    @Query(
+      'limit',
+      new ParseIntPipe({
+        errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE,
+      }),
+    )
+    limit: number,
+  ): Promise<TaskI[]> {
+    return await this.tasksService.getTasks(page, limit);
   }
 
   @Get('/:id')
@@ -49,6 +66,13 @@ export class TasksController {
   @UseGuards(JwtGuard, RolesGuard)
   async getTaskById(@Param('id') id: string): Promise<TaskI> {
     return await this.tasksService.getTaskById(id);
+  }
+
+  @Get('/user/:id')
+  @Roles(Role.AUDITOR, Role.STAFF, Role.USER)
+  @UseGuards(JwtGuard, RolesGuard)
+  async getTasksByUser(@Param('id') id: string): Promise<TaskI[]> {
+    return await this.tasksService.getTasksByUser(id);
   }
 
   @Patch('/:id')
