@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  ParseArrayPipe,
   Post,
   UploadedFiles,
   UseGuards,
@@ -13,26 +14,29 @@ import { Role } from 'src/shared/enums/role.enum';
 import { JwtGuard } from 'src/shared/guards/jwt.guard';
 import { RolesGuard } from 'src/shared/guards/roles.guard';
 import { FilesService } from './files.service';
-import { ApiSecurity } from '@nestjs/swagger';
+import { ApiTags, ApiConsumes, ApiBearerAuth } from '@nestjs/swagger';
+import { DeleteFilesDto } from './dto/delete-files.dto';
 
+@ApiTags('Files')
+@ApiBearerAuth()
 @Controller('files')
+@Roles(Role.AUDITOR, Role.STAFF)
+@UseGuards(JwtGuard, RolesGuard)
 export class FilesController {
   constructor(private readonly filesService: FilesService) {}
 
   @Post()
-  @ApiSecurity('JWT-auth')
-  @Roles(Role.AUDITOR, Role.STAFF)
-  @UseGuards(JwtGuard, RolesGuard)
   @UseInterceptors(FilesInterceptor('files'))
+  @ApiConsumes('multipart/form-data')
   async uploadFiles(@UploadedFiles() files: Express.Multer.File[]) {
     return await this.filesService.uploadFiles(files);
   }
 
   @Delete()
-  @ApiSecurity('JWT-auth')
-  @Roles(Role.AUDITOR, Role.STAFF)
-  @UseGuards(JwtGuard, RolesGuard)
-  async deleteFiles(@Body() keys: { key: string }[]) {
-    return await this.filesService.deleteFiles(keys);
+  async deleteFiles(
+    @Body(new ParseArrayPipe({ items: DeleteFilesDto }))
+    deleteFilesDtos: DeleteFilesDto[],
+  ) {
+    return await this.filesService.deleteFiles(deleteFilesDtos);
   }
 }

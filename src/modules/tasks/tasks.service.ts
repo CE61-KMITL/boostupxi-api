@@ -104,7 +104,7 @@ export class TasksService {
     ) {
       const keys = task.files.map((file) => ({ key: file.key }));
       await this.awsService.deleteFiles(keys);
-      await task.delete();
+      await this.taskModel.findByIdAndDelete(id);
       throw new HttpException('TASK_DELETED', HttpStatus.OK);
     }
     throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
