@@ -41,17 +41,7 @@ async function bootstrap() {
     const config = new DocumentBuilder()
       .setTitle('CE BOOSTUP XI Documentation')
       .setDescription('This is the documentation for CE BOOSTUP XI API.')
-      .addBearerAuth(
-        {
-          type: 'http',
-          scheme: 'bearer',
-          bearerFormat: 'JWT',
-          name: 'JWT',
-          description: 'Enter JWT Token',
-          in: 'header',
-        },
-        'JWT-auth',
-      )
+      .addBearerAuth()
       .build();
 
     const document = SwaggerModule.createDocument(app, config);

@@ -8,25 +8,25 @@ import {
 } from 'class-validator';
 import { FileI } from 'src/shared/interfaces/file.interface';
 import { TestCaseI } from 'src/shared/interfaces/testcase.interface';
-import { ApiProperty, ApiTags } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateTaskDto {
   @ApiProperty({
-    example: 'คิดเลขนะ',
+    example: 'Task 1',
   })
   @IsString()
   @IsNotEmpty()
   title: string;
 
   @ApiProperty({
-    example: 'use all you have',
+    example: 'Description',
   })
   @IsString()
   @IsNotEmpty()
   description: string;
 
   @ApiProperty({
-    example: 3,
+    example: 1,
   })
   @IsNumber()
   @Min(1)
@@ -35,14 +35,14 @@ export class CreateTaskDto {
   level: number;
 
   @ApiProperty({
-    example: ['ctf', 'reverse engineer'],
+    example: ['tag1', 'tag2'],
   })
   @IsArray()
   @IsNotEmpty()
   tags: string[];
 
   @ApiProperty({
-    example: 'google',
+    example: 'Hint',
   })
   @IsString()
   @IsNotEmpty()
@@ -51,19 +51,9 @@ export class CreateTaskDto {
   @ApiProperty({
     example: [
       {
-        input: '1',
-        output: 'a',
+        input: 'input',
+        output: 'output',
         published: true,
-      },
-      {
-        input: '2',
-        output: 'aa',
-        published: true,
-      },
-      {
-        input: '3',
-        output: 'aaa',
-        published: false,
       },
     ],
   })
@@ -72,8 +62,7 @@ export class CreateTaskDto {
   testcases: TestCaseI[];
 
   @ApiProperty({
-    example:
-      '#include <stdio.h> int main() { printf("Hello, World!");return 0; }',
+    example: "console.log('Hello World!');",
   })
   @IsString()
   @IsNotEmpty()
@@ -82,9 +71,8 @@ export class CreateTaskDto {
   @ApiProperty({
     example: [
       {
-        key: '43229f6f-51ca-4c0b-b3ee-836b2f602adf.png',
-        url: 'https://ce-boostup-xi.s3.amazonaws.com/43229f6f-51ca-4c0b-b3ee-836b2f602adf.png',
-        originalName: '01_20230223_กิตติพศ หลำบางช้าง.png',
+        key: 'key',
+        url: 'url',
       },
     ],
   })

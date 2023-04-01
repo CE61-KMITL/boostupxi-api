@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { AwsService } from '../aws/aws.service';
+import { DeleteFilesDto } from './dto/delete-files.dto';
 
 @Injectable()
 export class FilesService {
@@ -15,8 +16,8 @@ export class FilesService {
     });
   }
 
-  async deleteFiles(keys: { key: string }[]) {
-    await this.awsService.deleteFiles(keys);
+  async deleteFiles(deleteFilesDtos: DeleteFilesDto[]) {
+    await this.awsService.deleteFiles(deleteFilesDtos);
     throw new HttpException('FILES_DELETED', HttpStatus.OK);
   }
 }
