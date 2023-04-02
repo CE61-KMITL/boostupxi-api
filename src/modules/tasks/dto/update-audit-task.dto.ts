@@ -6,6 +6,7 @@ import { ApiProperty } from '@nestjs/swagger';
 export class UpdateAuditTaskDto {
   @ApiProperty({
     example: 'approve',
+    description: 'Status of the task',
   })
   @IsEnum(TaskStatus)
   @IsNotEmpty()
@@ -13,6 +14,7 @@ export class UpdateAuditTaskDto {
 
   @ApiProperty({
     example: true,
+    description: 'Draft of the task',
   })
   @IsBoolean()
   @IsNotEmpty()
