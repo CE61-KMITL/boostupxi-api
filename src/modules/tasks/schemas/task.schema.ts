@@ -6,6 +6,11 @@ import { ITestCase } from 'src/shared/interfaces/testcase.interface';
 import { TaskStatus } from '../enum/task-status.enum';
 import { IAuthor } from '../../../shared/interfaces/task.interface';
 
+const AuthorSchema = raw({
+  id: { type: Types.ObjectId, required: true },
+  username: { type: String, required: true },
+});
+
 @Schema({ timestamps: true })
 export class Task extends Document {
   @Prop({ required: true, unique: true })
@@ -14,12 +19,7 @@ export class Task extends Document {
   @Prop({ required: true })
   description: string;
 
-  @Prop(
-    raw({
-      id: { type: Types.ObjectId, ref: 'User', required: true },
-      username: { type: String, required: true },
-    }),
-  )
+  @Prop({ required: true, type: AuthorSchema })
   author: IAuthor;
 
   @Prop({ required: true, min: 1, max: 5 })
