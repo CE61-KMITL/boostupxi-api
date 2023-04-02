@@ -1,10 +1,10 @@
 import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import { FileI } from 'src/shared/interfaces/file.interface';
-import { StatusT } from 'src/shared/interfaces/task.interface';
-import { TestCaseI } from 'src/shared/interfaces/testcase.interface';
+import { IFile } from 'src/shared/interfaces/file.interface';
+import { StatusType } from 'src/shared/interfaces/task.interface';
+import { ITestCase } from 'src/shared/interfaces/testcase.interface';
 import { TaskStatus } from '../enum/task-status.enum';
-import { AuthorI } from '../../../shared/interfaces/task.interface';
+import { IAuthor } from '../../../shared/interfaces/task.interface';
 
 @Schema({ timestamps: true })
 export class Task extends Document {
@@ -20,7 +20,7 @@ export class Task extends Document {
       username: { type: String, required: true },
     }),
   )
-  author: AuthorI;
+  author: IAuthor;
 
   @Prop({ required: true, min: 1, max: 5 })
   level: number;
@@ -32,16 +32,16 @@ export class Task extends Document {
   hint: string;
 
   @Prop({ required: true })
-  files: FileI[];
+  files: IFile[];
 
   @Prop({ required: true })
-  testcases: TestCaseI[];
+  testcases: ITestCase[];
 
   @Prop({ default: true })
   draft: boolean;
 
-  @Prop({ default: TaskStatus.QUEUE })
-  status: StatusT;
+  @Prop({ default: TaskStatus.Queued })
+  status: StatusType;
 
   @Prop({ required: true })
   solution_code: string;

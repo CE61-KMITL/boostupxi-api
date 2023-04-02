@@ -1,5 +1,5 @@
 export enum TaskStatus {
-  QUEUE = 'queue',
-  APPROVE = 'approve',
-  REJECT = 'reject',
+  Queued = 'queued',
+  Approved = 'approved',
+  Rejected = 'rejected',
 }

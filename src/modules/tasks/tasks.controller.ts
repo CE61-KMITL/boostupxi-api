@@ -19,7 +19,7 @@ import { JwtGuard } from 'src/shared/guards/jwt.guard';
 import { RolesGuard } from 'src/shared/guards/roles.guard';
 import { TasksService } from '../tasks/tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
-import { UserI } from '../../shared/interfaces/user.interface';
+import { IUser } from '../../shared/interfaces/user.interface';
 import { TaskI } from 'src/shared/interfaces/task.interface';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { UpdateAuditTaskDto } from './dto/update-audit-task.dto';
@@ -33,17 +33,17 @@ export class TasksController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @Roles(Role.AUDITOR, Role.STAFF)
+  @Roles(Role.Auditor, Role.Staff)
   @UseGuards(JwtGuard, RolesGuard)
   async createTask(
     @Body() createTaskDto: CreateTaskDto,
-    @GetUser() user: UserI,
+    @GetUser() user: IUser,
   ) {
     return await this.tasksService.createTask(createTaskDto, user);
   }
 
   @Get()
-  @Roles(Role.AUDITOR, Role.STAFF, Role.USER)
+  @Roles(Role.Auditor, Role.Staff, Role.User)
   @UseGuards(JwtGuard, RolesGuard)
   async getTasks(
     @Query(
@@ -65,21 +65,21 @@ export class TasksController {
   }
 
   @Get('/:id')
-  @Roles(Role.AUDITOR, Role.STAFF, Role.USER)
+  @Roles(Role.Auditor, Role.Staff, Role.User)
   @UseGuards(JwtGuard, RolesGuard)
   async getTaskById(@Param('id') id: string): Promise<TaskI> {
     return await this.tasksService.getTaskById(id);
   }
 
   @Get('/user/:id')
-  @Roles(Role.AUDITOR, Role.STAFF, Role.USER)
+  @Roles(Role.Auditor, Role.Staff, Role.User)
   @UseGuards(JwtGuard, RolesGuard)
   async getTasksByUser(@Param('id') id: string): Promise<TaskI[]> {
     return await this.tasksService.getTasksByUser(id);
   }
 
   @Patch('/:id')
-  @Roles(Role.AUDITOR, Role.STAFF)
+  @Roles(Role.Auditor, Role.Staff)
   @UseGuards(JwtGuard, RolesGuard)
   async updateTask(
     @Param('id') id: string,
@@ -89,7 +89,7 @@ export class TasksController {
   }
 
   @Patch('/audit/:id')
-  @Roles(Role.AUDITOR)
+  @Roles(Role.Auditor)
   @UseGuards(JwtGuard, RolesGuard)
   async auditTask(
     @Param('id') id: string,
@@ -99,9 +99,9 @@ export class TasksController {
   }
 
   @Delete('/:id')
-  @Roles(Role.AUDITOR, Role.STAFF)
+  @Roles(Role.Auditor, Role.Staff)
   @UseGuards(JwtGuard, RolesGuard)
-  async deleteTask(@Param('id') id: string, @GetUser() user: UserI) {
+  async deleteTask(@Param('id') id: string, @GetUser() user: IUser) {
     return await this.tasksService.deleteTask(id, user);
   }
 }

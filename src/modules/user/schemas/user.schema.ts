@@ -16,7 +16,7 @@ export class User extends Document {
   @Prop({ default: 0 })
   score: number;
 
-  @Prop({ default: Role.USER })
+  @Prop({ default: Role.User })
   role: Role;
 }
 

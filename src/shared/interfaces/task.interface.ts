@@ -1,24 +1,24 @@
-import { Document, Types } from 'mongoose';
-import { FileI } from './file.interface';
-import { TestCaseI } from './testcase.interface';
+import { Document } from 'mongoose';
+import { IFile } from './file.interface';
+import { ITestCase } from './testcase.interface';
 
-export type StatusT = 'queue' | 'approve' | 'reject';
+export type StatusType = 'queue' | 'approve' | 'reject';
 
-export interface AuthorI {
-  id: Types.ObjectId;
+export interface IAuthor {
+  id: string;
   username: string;
 }
 
 export interface TaskI extends Document {
   title: string;
   description: string;
-  author: AuthorI;
+  author: IAuthor;
   level: number;
   tags: string[];
   hint: string;
-  files: FileI[];
-  testcases: TestCaseI[];
+  files: IFile[];
+  testcases: ITestCase[];
   draft: boolean;
-  status: StatusT;
+  status: StatusType;
   solution_code: string;
 }

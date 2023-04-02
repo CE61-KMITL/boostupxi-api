@@ -4,26 +4,28 @@ import { InjectModel } from '@nestjs/mongoose';
 import { PassportStrategy } from '@nestjs/passport';
 import { Model } from 'mongoose';
 import { Strategy, ExtractJwt } from 'passport-jwt';
-import { UserI } from 'src/shared/interfaces/user.interface';
+import { IUser } from 'src/shared/interfaces/user.interface';
 import { User } from 'src/modules/user/schemas/user.schema';
-import { JwtPayloadI } from '../interfaces/jwt.interface';
-import { Request } from 'express';
+import { IJwtPayload } from '../interfaces/jwt.interface';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     configService: ConfigService,
-    @InjectModel(User.name) private userModel: Model<UserI>,
+    @InjectModel(User.name) private userModel: Model<IUser>,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       secretOrKey: configService.get('jwtSecret'),
-      passReqToCallback: true,
     });
   }
 
-  async validate(req: Request, payload: JwtPayloadI): Promise<UserI> {
-    const user = await this.userModel.findOne({ _id: payload.sub });
+  async validate(payload: IJwtPayload): Promise<IUser> {
+    const user = await this.userModel
+      .findOne({ _id: payload.sub })
+      .select('-password')
+      .exec();
+
     if (!user) {
       throw new UnauthorizedException();
     }
