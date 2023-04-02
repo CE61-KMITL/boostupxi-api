@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import { Task } from './schemas/task.schema';
 import { TaskI } from 'src/shared/interfaces/task.interface';
 import { CreateTaskDto } from './dto/create-task.dto';
-import { UserI } from '../../shared/interfaces/user.interface';
+import { IUser } from '../../shared/interfaces/user.interface';
 import { Role } from 'src/shared/enums/role.enum';
 import { AwsService } from '../aws/aws.service';
 import { UpdateTaskDto } from './dto/update-task.dto';
@@ -17,7 +17,7 @@ export class TasksService {
     private awsService: AwsService,
   ) {}
 
-  async createTask(createTaskDto: CreateTaskDto, user: UserI): Promise<TaskI> {
+  async createTask(createTaskDto: CreateTaskDto, user: IUser): Promise<TaskI> {
     const task = await this.taskModel.findOne({
       title: createTaskDto.title,
     });
@@ -94,12 +94,12 @@ export class TasksService {
     return updatedTask;
   }
 
-  async deleteTask(id: string, user: UserI) {
+  async deleteTask(id: string, user: IUser) {
     const task = await this.taskModel.findById(id);
     if (
       task &&
-      (user.role === Role.AUDITOR ||
-        (user.role === Role.STAFF &&
+      (user.role === Role.Auditor ||
+        (user.role === Role.Staff &&
           task.author.id.toString() === user._id.toString()))
     ) {
       const keys = task.files.map((file) => ({ key: file.key }));

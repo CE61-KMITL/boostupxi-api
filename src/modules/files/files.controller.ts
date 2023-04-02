@@ -22,7 +22,7 @@ import { DeleteFilesDto } from './dto/delete-files.dto';
 @ApiTags('Files')
 @ApiBearerAuth()
 @Controller('files')
-@Roles(Role.AUDITOR, Role.STAFF)
+@Roles(Role.Auditor, Role.Staff)
 @UseGuards(JwtGuard, RolesGuard)
 export class FilesController {
   constructor(private readonly filesService: FilesService) {}

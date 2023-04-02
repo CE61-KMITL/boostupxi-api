@@ -3,6 +3,7 @@ import { AppModule } from './modules/app/app.module';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -15,9 +16,11 @@ async function bootstrap() {
     .get<string>('allowed_origins')
     .split(',');
 
+  app.use(helmet());
+
   app.useGlobalPipes(
     new ValidationPipe({
-      disableErrorMessages: node_env === 'production' ? true : false,
+      disableErrorMessages: node_env === 'production',
       whitelist: true,
       transform: true,
     }),
@@ -25,13 +28,11 @@ async function bootstrap() {
 
   app.enableCors({
     origin: (origin, callback) => {
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.indexOf(origin) === -1) {
-        const msg =
-          'The CORS policy for this site does not allow access from the specified Origin.';
-        return callback(new Error(msg), false);
+      if (!origin || !allowedOrigins || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'), false);
       }
-      return callback(null, true);
     },
     methods: ['GET', 'POST', 'PATCH', 'DELETE'],
     optionsSuccessStatus: 200,

@@ -6,8 +6,8 @@ import {
   IsArray,
   IsNotEmpty,
 } from 'class-validator';
-import { FileI } from 'src/shared/interfaces/file.interface';
-import { TestCaseI } from 'src/shared/interfaces/testcase.interface';
+import { IFile } from 'src/shared/interfaces/file.interface';
+import { ITestCase } from 'src/shared/interfaces/testcase.interface';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateTaskDto {
@@ -59,7 +59,7 @@ export class CreateTaskDto {
   })
   @IsArray()
   @IsNotEmpty()
-  testcases: TestCaseI[];
+  testcases: ITestCase[];
 
   @ApiProperty({
     example: "console.log('Hello World!');",
@@ -78,5 +78,5 @@ export class CreateTaskDto {
   })
   @IsArray()
   @IsNotEmpty()
-  files: FileI[];
+  files: IFile[];
 }
