@@ -24,6 +24,8 @@ import { TaskI } from 'src/shared/interfaces/task.interface';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { UpdateAuditTaskDto } from './dto/update-audit-task.dto';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { CreateCommentDto } from './dto/create-comment.dto';
+import { UpdateCommentDto } from './dto/update-comment.dto';
 
 @ApiTags('Tasks')
 @ApiBearerAuth()
@@ -103,5 +105,46 @@ export class TasksController {
   @UseGuards(JwtGuard, RolesGuard)
   async deleteTask(@Param('id') id: string, @GetUser() user: IUser) {
     return await this.tasksService.deleteTask(id, user);
+  }
+
+  @Post('/:id/comment')
+  @Roles(Role.Auditor, Role.Staff)
+  @UseGuards(JwtGuard, RolesGuard)
+  @HttpCode(HttpStatus.CREATED)
+  async addComment(
+    @Param('id') id: string,
+    @GetUser() user: IUser,
+    @Body() createCommentDto: CreateCommentDto,
+  ) {
+    console.log(createCommentDto);
+    return await this.tasksService.createComment(id, user, createCommentDto);
+  }
+
+  @Delete('/:id/comment/:commentId')
+  @Roles(Role.Auditor, Role.Staff)
+  @UseGuards(JwtGuard, RolesGuard)
+  async deleteComment(
+    @Param('id') id: string,
+    @GetUser() user: IUser,
+    @Param('commentId') commentId: string,
+  ) {
+    return await this.tasksService.deleteComment(id, user, commentId);
+  }
+
+  @Patch('/:id/comment/:commentId')
+  @Roles(Role.Auditor, Role.Staff)
+  @UseGuards(JwtGuard, RolesGuard)
+  async updateComment(
+    @Param('id') id: string,
+    @GetUser() user: IUser,
+    @Body() updateCommentDto: UpdateCommentDto,
+    @Param('commentId') commentId: string,
+  ) {
+    return await this.tasksService.updateComment(
+      id,
+      user,
+      updateCommentDto,
+      commentId,
+    );
   }
 }

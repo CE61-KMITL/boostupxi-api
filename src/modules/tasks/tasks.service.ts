@@ -9,6 +9,9 @@ import { Role } from 'src/shared/enums/role.enum';
 import { AwsService } from '../aws/aws.service';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { UpdateAuditTaskDto } from './dto/update-audit-task.dto';
+import { CreateCommentDto } from './dto/create-comment.dto';
+import { UpdateCommentDto } from './dto/update-comment.dto';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class TasksService {
@@ -108,5 +111,109 @@ export class TasksService {
       throw new HttpException('TASK_DELETED', HttpStatus.OK);
     }
     throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
+  }
+
+  async createComment(
+    id: string,
+    user: IUser,
+    createCommentDto: CreateCommentDto,
+  ) {
+    const task = await this.taskModel.findById(id);
+
+    if (!task) {
+      throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
+    }
+
+    const newComment = {
+      ...createCommentDto,
+      author: {
+        id: user._id,
+        username: user.username,
+      },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      id: uuidv4(),
+    };
+
+    const updatedTask = await this.taskModel.findByIdAndUpdate(
+      id,
+      { $push: { comments: newComment } },
+      { new: true },
+    );
+
+    return updatedTask;
+  }
+
+  async deleteComment(id: string, user: IUser, commentId: string) {
+    const task = await this.taskModel.findById(id);
+
+    if (!task) {
+      throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
+    }
+
+    const comment = task.comments.find(
+      (comment) => comment.id.toString() === commentId,
+    );
+
+    if (!comment) {
+      throw new HttpException('COMMENT_NOT_FOUND', HttpStatus.NOT_FOUND);
+    }
+
+    if (comment.author.id.toString() !== user._id.toString()) {
+      throw new HttpException('UNAUTHORIZED', HttpStatus.UNAUTHORIZED);
+    }
+
+    const deletedComment = await this.taskModel.findByIdAndUpdate(
+      id,
+      { $pull: { comments: { id: commentId } } },
+      { new: true },
+    );
+
+    if (!deletedComment) {
+      throw new HttpException('COMMENT_NOT_FOUND', HttpStatus.NOT_FOUND);
+    }
+
+    throw new HttpException('TASK_DELETED', HttpStatus.OK);
+  }
+
+  async updateComment(
+    id: string,
+    user: IUser,
+    updateCommentDto: UpdateCommentDto,
+    commentId: string,
+  ) {
+    const task = await this.taskModel.findById(id);
+
+    if (!task) {
+      throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
+    }
+
+    const comment = task.comments.find(
+      (comment) => comment.id.toString() === commentId,
+    );
+
+    if (!comment) {
+      throw new HttpException('COMMENT_NOT_FOUND', HttpStatus.NOT_FOUND);
+    }
+
+    if (comment.author.id.toString() !== user._id.toString()) {
+      throw new HttpException('UNAUTHORIZED', HttpStatus.UNAUTHORIZED);
+    }
+
+    const updatedComment = await this.taskModel.findByIdAndUpdate(
+      id,
+      {
+        $set: {
+          'comments.$[comment].message': updateCommentDto.message,
+          'comments.$[comment].updatedAt': new Date().toISOString(),
+        },
+      },
+      {
+        arrayFilters: [{ 'comment.id': commentId }],
+        new: true,
+      },
+    );
+
+    return updatedComment;
   }
 }
