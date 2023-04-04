@@ -39,13 +39,21 @@ export class TasksService {
     return newTask;
   }
 
-  async getTasks(page = 1, limit = 25): Promise<TaskI[]> {
+  async getTasks(page = 1, limit = 25) {
     const tasks = await this.taskModel
       .find()
       .skip((page - 1) * limit)
       .limit(limit)
       .exec();
-    return tasks;
+
+    const count = await this.taskModel.countDocuments();
+    const pages = Math.ceil(count / limit);
+
+    return {
+      currentPage: page,
+      pages,
+      data: tasks,
+    };
   }
 
   async getTaskById(id: string): Promise<TaskI> {

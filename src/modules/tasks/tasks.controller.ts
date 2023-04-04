@@ -62,7 +62,7 @@ export class TasksController {
       }),
     )
     limit: number,
-  ): Promise<TaskI[]> {
+  ) {
     return await this.tasksService.getTasks(page, limit);
   }
 
