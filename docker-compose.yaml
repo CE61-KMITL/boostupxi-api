@@ -1,0 +1,66 @@
+version: '3.9'
+services:
+  dev:
+    container_name: server-dev
+    build:
+      context: .
+      target: development
+      dockerfile: Dockerfile
+    command: npm run start:debug
+    ports:
+      - 3000:3000
+      - 9229:9229
+
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    restart: unless-stopped
+    depends_on:
+      - mongo
+    environment:
+      MONGO_PORT: 27017
+      PORT: 3000
+      NODE_ENV: development
+      JWT_SECRET: 87aaf8c0aab8bb82e0c5318bde62a0d6dc1b9f24d68ae6a127b44826d1e96fc5
+      ALLOWED_ORIGINS: http://localhost:3000
+      MONGO_URI: mongodb://mongo:27017
+      AWS_BUCKET: backend-storage
+      AWS_ACCESS_KEY_ID: masoud
+      AWS_SECRET_ACCESS_KEY: Strong#Pass#2022
+      AWS_ENDPOINT: http://minio:9000
+
+  mongo:
+    image: mongo
+    container_name: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./mongo-data:/data/db
+
+
+  minio:
+    image: minio/minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_storage:/data
+    environment:
+      MINIO_ROOT_USER: masoud
+      MINIO_ROOT_PASSWORD: Strong#Pass#2022
+    command: server --console-address ":9001" /data
+
+  createbuckets:
+    image: minio/mc
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc alias set myminio http://minio:9000 masoud Strong#Pass#2022;
+      /usr/bin/mc mb myminio/backend-storage;
+      /usr/bin/mc policy set public myminio/backend-storage;
+      exit 0;
+      "
+volumes:
+  minio_storage: {}
