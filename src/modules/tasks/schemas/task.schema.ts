@@ -32,7 +32,7 @@ export class Task extends Document {
   @Prop({ default: '' })
   hint: string;
 
-  @Prop({ required: true })
+  @Prop({ default: [] })
   files: IFile[];
 
   @Prop({ required: true })
