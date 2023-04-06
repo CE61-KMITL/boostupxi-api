@@ -34,7 +34,7 @@ export class FilesController {
     @UploadedFiles(
       new ParseFilePipeBuilder()
         .addFileTypeValidator({
-          fileType: /(jpg|jpeg|png|zip)$/,
+          fileType: /(jpg|jpeg|png|zip)/,
         })
         .addMaxSizeValidator({
           maxSize: 1024 * 1024 * 5,
