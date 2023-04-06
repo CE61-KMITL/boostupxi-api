@@ -43,4 +43,4 @@ lerna-debug.log*
 #mongo
 /mongo-data
 
-
+.scannerwork
