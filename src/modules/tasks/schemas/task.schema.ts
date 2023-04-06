@@ -29,7 +29,7 @@ export class Task extends Document {
   @Prop({ required: true })
   tags: string[];
 
-  @Prop({ required: true })
+  @Prop({ default: '' })
   hint: string;
 
   @Prop({ required: true })

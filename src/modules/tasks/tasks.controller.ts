@@ -109,7 +109,6 @@ export class TasksController {
     @GetUser() user: IUser,
     @Body() createCommentDto: CreateCommentDto,
   ) {
-    console.log(createCommentDto);
     return await this.tasksService.createComment(id, user, createCommentDto);
   }
 

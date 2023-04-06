@@ -125,18 +125,14 @@ export class TasksService {
       throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
     }
 
-    const date = new Date();
-
-    date.setHours(date.getHours() + 7);
-
     const newComment = {
       ...createCommentDto,
       author: {
         id: user._id,
         username: user.username,
       },
-      createdAt: date.toISOString(),
-      updatedAt: date.toISOString(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
       id: uuidv4(),
     };
 
@@ -205,16 +201,12 @@ export class TasksService {
       throw new HttpException('UNAUTHORIZED', HttpStatus.UNAUTHORIZED);
     }
 
-    const date = new Date();
-
-    date.setHours(date.getHours() + 7);
-
     const updatedComment = await this.taskModel.findByIdAndUpdate(
       id,
       {
         $set: {
           'comments.$[comment].message': updateCommentDto.message,
-          'comments.$[comment].updatedAt': date.toISOString(),
+          'comments.$[comment].updatedAt': new Date().toISOString(),
         },
       },
       {
