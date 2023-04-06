@@ -45,7 +45,7 @@ export class TasksController {
   }
 
   @Get()
-  @Roles(Role.Auditor, Role.Staff, Role.User)
+  @Roles(Role.Auditor, Role.Staff)
   @UseGuards(JwtGuard, RolesGuard)
   async getTasks(
     @Query(
@@ -67,17 +67,10 @@ export class TasksController {
   }
 
   @Get('/:id')
-  @Roles(Role.Auditor, Role.Staff, Role.User)
+  @Roles(Role.Auditor, Role.Staff)
   @UseGuards(JwtGuard, RolesGuard)
   async getTaskById(@Param('id') id: string): Promise<TaskI> {
     return await this.tasksService.getTaskById(id);
-  }
-
-  @Get('/user/:id')
-  @Roles(Role.Auditor, Role.Staff, Role.User)
-  @UseGuards(JwtGuard, RolesGuard)
-  async getTasksByUser(@Param('id') id: string): Promise<TaskI[]> {
-    return await this.tasksService.getTasksByUser(id);
   }
 
   @Patch('/:id')

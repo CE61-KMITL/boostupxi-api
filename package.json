@@ -1,7 +1,7 @@
 {
-  "name": "grader-backend",
-  "version": "0.0.1",
-  "description": "",
+  "name": "boostupxi-api",
+  "version": "1.0.1",
+  "description": "This is an API for the CE BoostUp XI.",
   "author": "",
   "private": true,
   "license": "UNLICENSED",

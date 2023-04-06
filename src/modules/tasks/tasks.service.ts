@@ -66,13 +66,6 @@ export class TasksService {
     return task;
   }
 
-  async getTasksByUser(id: string): Promise<TaskI[]> {
-    const tasks = await this.taskModel.find({
-      'author.id': id,
-    });
-    return tasks;
-  }
-
   async updateTask(id: string, updateTaskDto: UpdateTaskDto) {
     const task = await this.taskModel.findById(id);
 

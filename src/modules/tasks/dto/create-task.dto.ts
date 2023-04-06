@@ -5,6 +5,7 @@ import {
   IsNumber,
   IsArray,
   IsNotEmpty,
+  IsOptional,
 } from 'class-validator';
 import { IFile } from 'src/shared/interfaces/file.interface';
 import { ITestCase } from 'src/shared/interfaces/testcase.interface';
@@ -50,7 +51,7 @@ export class CreateTaskDto {
     description: 'Hint of the task',
   })
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   hint: string;
 
   @ApiProperty({
@@ -85,6 +86,6 @@ export class CreateTaskDto {
     description: 'Files of the task',
   })
   @IsArray()
-  @IsNotEmpty()
+  @IsOptional()
   files: IFile[];
 }
