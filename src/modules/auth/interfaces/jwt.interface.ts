@@ -1,10 +1,10 @@
-export interface JwtPayloadI {
+export interface IJwtPayload {
   sub: string;
   role: string;
   iat?: number;
   exp?: number;
 }
 
-export interface TokenI {
+export interface IAccessToken {
   access_token: string;
 }

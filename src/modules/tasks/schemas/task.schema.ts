@@ -1,10 +1,16 @@
 import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import { FileI } from 'src/shared/interfaces/file.interface';
-import { StatusT } from 'src/shared/interfaces/task.interface';
-import { TestCaseI } from 'src/shared/interfaces/testcase.interface';
+import { IFile } from 'src/shared/interfaces/file.interface';
+import { StatusType } from 'src/shared/interfaces/task.interface';
+import { ITestCase } from 'src/shared/interfaces/testcase.interface';
 import { TaskStatus } from '../enum/task-status.enum';
-import { AuthorI } from '../../../shared/interfaces/task.interface';
+import { IAuthor } from '../../../shared/interfaces/task.interface';
+import { IComment } from '../../../shared/interfaces/comment.interface';
+
+const AuthorSchema = raw({
+  id: { type: Types.ObjectId, required: true, ref: 'User' },
+  username: { type: String, required: true },
+});
 
 @Schema({ timestamps: true })
 export class Task extends Document {
@@ -14,13 +20,8 @@ export class Task extends Document {
   @Prop({ required: true })
   description: string;
 
-  @Prop(
-    raw({
-      id: { type: Types.ObjectId, ref: 'User', required: true },
-      username: { type: String, required: true },
-    }),
-  )
-  author: AuthorI;
+  @Prop({ required: true, type: AuthorSchema })
+  author: IAuthor;
 
   @Prop({ required: true, min: 1, max: 5 })
   level: number;
@@ -28,23 +29,26 @@ export class Task extends Document {
   @Prop({ required: true })
   tags: string[];
 
-  @Prop({ required: true })
+  @Prop({ default: '' })
   hint: string;
 
-  @Prop({ required: true })
-  files: FileI[];
+  @Prop({ default: [] })
+  files: IFile[];
 
   @Prop({ required: true })
-  testcases: TestCaseI[];
+  testcases: ITestCase[];
 
   @Prop({ default: true })
   draft: boolean;
 
-  @Prop({ default: TaskStatus.QUEUE })
-  status: StatusT;
+  @Prop({ default: TaskStatus.Queued })
+  status: StatusType;
 
   @Prop({ required: true })
   solution_code: string;
+
+  @Prop({ default: [] })
+  comments: IComment[];
 }
 
 export const TaskSchema = SchemaFactory.createForClass(Task);

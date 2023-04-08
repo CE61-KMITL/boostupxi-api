@@ -1,13 +1,20 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import * as AWS from 'aws-sdk';
 import { ConfigService } from '@nestjs/config';
+import {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+} from '@aws-sdk/client-s3';
 
 @Injectable()
 export class AwsService {
   constructor(private configService: ConfigService) {}
-  private s3 = new AWS.S3({
-    accessKeyId: this.configService.get<string>('aws.accessKeyId'),
-    secretAccessKey: this.configService.get<string>('aws.secretAccessKey'),
+  private s3 = new S3Client({
+    region: this.configService.get<string>('aws.region'),
+    credentials: {
+      accessKeyId: this.configService.get<string>('aws.accessKeyId'),
+      secretAccessKey: this.configService.get<string>('aws.secretAccessKey'),
+    },
   });
 
   newFileName(originalname: string): string {
@@ -29,8 +36,11 @@ export class AwsService {
           Body: file.buffer,
           ACL: 'public-read',
         };
-        const uploadedFile = await this.s3.upload(params).promise();
-        return uploadedFile;
+        const command = new PutObjectCommand(params);
+        await this.s3.send(command);
+        const key = params.Key;
+        const url = `https://${params.Bucket}.s3.amazonaws.com/${key}`;
+        return { key, url };
       });
       return Promise.all(promises);
     } catch (err) {
@@ -45,7 +55,8 @@ export class AwsService {
           Bucket: this.configService.get<string>('aws.bucket'),
           Key: file.key,
         };
-        return this.s3.deleteObject(params).promise();
+        const command = new DeleteObjectCommand(params);
+        return this.s3.send(command);
       });
       return Promise.all(promises);
     } catch (err) {

@@ -8,12 +8,7 @@ export class FilesService {
 
   async uploadFiles(files: Express.Multer.File[]) {
     const uploadedFiles = await this.awsService.uploadFiles(files);
-    return uploadedFiles.map((file) => {
-      return {
-        key: file.Key,
-        url: file.Location,
-      };
-    });
+    return uploadedFiles;
   }
 
   async deleteFiles(deleteFilesDtos: DeleteFilesDto[]) {
