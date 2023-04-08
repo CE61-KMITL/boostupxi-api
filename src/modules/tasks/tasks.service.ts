@@ -5,7 +5,6 @@ import { Task } from './schemas/task.schema';
 import { TaskI } from 'src/shared/interfaces/task.interface';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { IUser } from '../../shared/interfaces/user.interface';
-import { Role } from 'src/shared/enums/role.enum';
 import { AwsService } from '../aws/aws.service';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { UpdateAuditTaskDto } from './dto/update-audit-task.dto';
@@ -66,11 +65,15 @@ export class TasksService {
     return task;
   }
 
-  async updateTask(id: string, updateTaskDto: UpdateTaskDto) {
+  async updateTask(id: string, updateTaskDto: UpdateTaskDto, user: IUser) {
     const task = await this.taskModel.findById(id);
 
     if (!task) {
       throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
+    }
+
+    if (task.author.id.toString() !== user._id.toString()) {
+      throw new HttpException('UNAUTHORIZED', HttpStatus.UNAUTHORIZED);
     }
 
     const updatedTask = await this.taskModel.findByIdAndUpdate(
@@ -82,36 +85,47 @@ export class TasksService {
     return updatedTask;
   }
 
-  async auditTask(id: string, updateAuditTaskDto: UpdateAuditTaskDto) {
+  async auditTask(
+    id: string,
+    updateAuditTaskDto: UpdateAuditTaskDto,
+    user: IUser,
+  ) {
     const task = await this.taskModel.findById(id);
 
     if (!task) {
       throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
     }
 
-    const updatedTask = await this.taskModel.findByIdAndUpdate(
-      id,
-      updateAuditTaskDto,
-      { new: true },
-    );
-
-    return updatedTask;
+    if (task.author.id.toString() !== user._id.toString()) {
+      const updatedTask = await this.taskModel.findByIdAndUpdate(
+        id,
+        updateAuditTaskDto,
+        { new: true },
+      );
+      return updatedTask;
+    } else {
+      throw new HttpException(
+        'CAN_NOT_AUDIT_YOUR_OWN_TASK',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
   async deleteTask(id: string, user: IUser) {
     const task = await this.taskModel.findById(id);
-    if (
-      task &&
-      (user.role === Role.Auditor ||
-        (user.role === Role.Staff &&
-          task.author.id.toString() === user._id.toString()))
-    ) {
-      const keys = task.files.map((file) => ({ key: file.key }));
-      await this.awsService.deleteFiles(keys);
-      await this.taskModel.findByIdAndDelete(id);
-      throw new HttpException('TASK_DELETED', HttpStatus.OK);
+
+    if (!task) {
+      throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
     }
-    throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
+
+    if (task.author.id.toString() !== user._id.toString()) {
+      throw new HttpException('UNAUTHORIZED', HttpStatus.UNAUTHORIZED);
+    }
+
+    const keys = task.files.map((file) => ({ key: file.key }));
+    await this.awsService.deleteFiles(keys);
+    await this.taskModel.findByIdAndDelete(id);
+    throw new HttpException('TASK_DELETED', HttpStatus.OK);
   }
 
   async createComment(
