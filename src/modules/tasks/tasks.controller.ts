@@ -79,8 +79,9 @@ export class TasksController {
   async updateTask(
     @Param('id') id: string,
     @Body() updateTaskDto: UpdateTaskDto,
+    @GetUser() user: IUser,
   ) {
-    return await this.tasksService.updateTask(id, updateTaskDto);
+    return await this.tasksService.updateTask(id, updateTaskDto, user);
   }
 
   @Patch('/audit/:id')
@@ -89,8 +90,9 @@ export class TasksController {
   async auditTask(
     @Param('id') id: string,
     @Body() updateAuditTaskDto: UpdateAuditTaskDto,
+    @GetUser() user: IUser,
   ) {
-    return await this.tasksService.auditTask(id, updateAuditTaskDto);
+    return await this.tasksService.auditTask(id, updateAuditTaskDto, user);
   }
 
   @Delete('/:id')
