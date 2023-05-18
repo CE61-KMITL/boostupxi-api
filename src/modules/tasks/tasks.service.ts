@@ -11,6 +11,7 @@ import { UpdateAuditTaskDto } from './dto/update-audit-task.dto';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { v4 as uuidv4 } from 'uuid';
+import { UpdateDraftTaskDto } from './dto/update-draft-task.dto';
 
 @Injectable()
 export class TasksService {
@@ -109,6 +110,22 @@ export class TasksService {
         HttpStatus.BAD_REQUEST,
       );
     }
+  }
+
+  async draftTask(id: string, updateDraftTaskDto: UpdateDraftTaskDto) {
+    const task = await this.taskModel.findById(id);
+
+    if (!task) {
+      throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
+    }
+
+    const updatedTask = await this.taskModel.findByIdAndUpdate(
+      id,
+      updateDraftTaskDto,
+      { new: true },
+    );
+
+    return updatedTask;
   }
 
   async deleteTask(id: string, user: IUser) {
