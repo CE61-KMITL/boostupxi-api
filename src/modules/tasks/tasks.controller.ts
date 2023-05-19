@@ -20,7 +20,7 @@ import { RolesGuard } from 'src/shared/guards/roles.guard';
 import { TasksService } from '../tasks/tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { IUser } from '../../shared/interfaces/user.interface';
-import { TaskI } from 'src/shared/interfaces/task.interface';
+import { ITask } from 'src/shared/interfaces/task.interface';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { UpdateAuditTaskDto } from './dto/update-audit-task.dto';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
@@ -36,7 +36,7 @@ export class TasksController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @Roles(Role.Auditor, Role.Staff)
+  @Roles(Role.Auditor, Role.Staff, Role.Admin)
   @UseGuards(JwtGuard, RolesGuard)
   async createTask(
     @Body() createTaskDto: CreateTaskDto,
@@ -67,15 +67,36 @@ export class TasksController {
     return await this.tasksService.getTasks(page, limit);
   }
 
+  @Get('/feed')
+  @UseGuards(JwtGuard)
+  async getFeedTasks(
+    @Query(
+      'page',
+      new ParseIntPipe({
+        errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE,
+      }),
+    )
+    page: number,
+    @Query(
+      'limit',
+      new ParseIntPipe({
+        errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE,
+      }),
+    )
+    limit: number,
+  ) {
+    return await this.tasksService.getFeedTasks(page, limit);
+  }
+
   @Get('/:id')
   @Roles(Role.Auditor, Role.Staff, Role.Admin)
   @UseGuards(JwtGuard, RolesGuard)
-  async getTaskById(@Param('id') id: string): Promise<TaskI> {
+  async getTaskById(@Param('id') id: string): Promise<ITask> {
     return await this.tasksService.getTaskById(id);
   }
 
   @Patch('/:id')
-  @Roles(Role.Auditor, Role.Staff)
+  @Roles(Role.Auditor, Role.Staff, Role.Admin)
   @UseGuards(JwtGuard, RolesGuard)
   async updateTask(
     @Param('id') id: string,
@@ -86,7 +107,7 @@ export class TasksController {
   }
 
   @Patch('/:id/audit')
-  @Roles(Role.Auditor)
+  @Roles(Role.Auditor, Role.Admin)
   @UseGuards(JwtGuard, RolesGuard)
   async auditTask(
     @Param('id') id: string,
@@ -107,14 +128,14 @@ export class TasksController {
   }
 
   @Delete('/:id')
-  @Roles(Role.Auditor, Role.Staff)
+  @Roles(Role.Auditor, Role.Staff, Role.Admin)
   @UseGuards(JwtGuard, RolesGuard)
   async deleteTask(@Param('id') id: string, @GetUser() user: IUser) {
     return await this.tasksService.deleteTask(id, user);
   }
 
   @Post('/:id/comment')
-  @Roles(Role.Auditor, Role.Staff)
+  @Roles(Role.Auditor, Role.Staff, Role.Admin)
   @UseGuards(JwtGuard, RolesGuard)
   @HttpCode(HttpStatus.CREATED)
   async addComment(
@@ -126,7 +147,7 @@ export class TasksController {
   }
 
   @Delete('/:id/comment/:commentId')
-  @Roles(Role.Auditor, Role.Staff)
+  @Roles(Role.Auditor, Role.Staff, Role.Admin)
   @UseGuards(JwtGuard, RolesGuard)
   async deleteComment(
     @Param('id') id: string,
@@ -137,7 +158,7 @@ export class TasksController {
   }
 
   @Patch('/:id/comment/:commentId')
-  @Roles(Role.Auditor, Role.Staff)
+  @Roles(Role.Auditor, Role.Staff, Role.Admin)
   @UseGuards(JwtGuard, RolesGuard)
   async updateComment(
     @Param('id') id: string,
