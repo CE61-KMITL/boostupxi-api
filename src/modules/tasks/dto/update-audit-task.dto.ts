@@ -1,5 +1,5 @@
 import { IsEnum, IsNotEmpty } from 'class-validator';
-import { StatusType } from 'src/shared/interfaces/task.interface';
+import { StatusType } from '@/shared/interfaces/task.interface';
 import { TaskStatus } from '../enum/task-status.enum';
 import { ApiProperty } from '@nestjs/swagger';
 

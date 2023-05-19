@@ -1,11 +1,11 @@
 import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import { IFile } from 'src/shared/interfaces/file.interface';
-import { StatusType } from 'src/shared/interfaces/task.interface';
-import { ITestCase } from 'src/shared/interfaces/testcase.interface';
+import { IFile } from '@/shared/interfaces/file.interface';
+import { StatusType } from '@/shared/interfaces/task.interface';
+import { ITestCase } from '@/shared/interfaces/testcase.interface';
 import { TaskStatus } from '../enum/task-status.enum';
-import { IAuthor } from '../../../shared/interfaces/task.interface';
-import { IComment } from '../../../shared/interfaces/comment.interface';
+import { IAuthor } from '@/shared/interfaces/task.interface';
+import { IComment } from '@/shared/interfaces/comment.interface';
 
 const AuthorSchema = raw({
   id: { type: Types.ObjectId, required: true, ref: 'User' },
