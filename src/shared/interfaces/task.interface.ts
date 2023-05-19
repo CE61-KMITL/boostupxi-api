@@ -10,7 +10,7 @@ export interface IAuthor {
   username: string;
 }
 
-export interface TaskI extends Document {
+export interface ITask extends Document {
   title: string;
   description: string;
   author: IAuthor;

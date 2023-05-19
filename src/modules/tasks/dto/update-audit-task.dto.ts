@@ -1,4 +1,4 @@
-import { IsBoolean, IsEnum, IsOptional } from 'class-validator';
+import { IsEnum, IsNotEmpty } from 'class-validator';
 import { StatusType } from 'src/shared/interfaces/task.interface';
 import { TaskStatus } from '../enum/task-status.enum';
 import { ApiProperty } from '@nestjs/swagger';
@@ -9,14 +9,6 @@ export class UpdateAuditTaskDto {
     description: 'Status of the task',
   })
   @IsEnum(TaskStatus)
-  @IsOptional()
+  @IsNotEmpty()
   status: StatusType;
-
-  @ApiProperty({
-    example: true,
-    description: 'Draft of the task',
-  })
-  @IsBoolean()
-  @IsOptional()
-  draft: boolean;
 }

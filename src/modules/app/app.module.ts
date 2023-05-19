@@ -14,6 +14,7 @@ import { UserModule } from '../user/user.module';
 import { TasksModule } from '../tasks/tasks.module';
 import { AuthModule } from '../auth/auth.module';
 import { FilesModule } from '../files/files.module';
+import { LeaderboardModule } from '../leaderboard/leaderboard.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { FilesModule } from '../files/files.module';
     UserModule,
     TasksModule,
     FilesModule,
+    LeaderboardModule,
   ],
   controllers: [AppController],
   providers: [AppService],
