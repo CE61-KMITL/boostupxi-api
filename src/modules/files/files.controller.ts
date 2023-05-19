@@ -11,10 +11,10 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { Roles } from 'src/shared/decorators/roles.decorator';
-import { Role } from 'src/shared/enums/role.enum';
-import { JwtGuard } from 'src/shared/guards/jwt.guard';
-import { RolesGuard } from 'src/shared/guards/roles.guard';
+import { Roles } from '@/shared/decorators/roles.decorator';
+import { Role } from '@/shared/enums/role.enum';
+import { JwtGuard } from '@/shared/guards/jwt.guard';
+import { RolesGuard } from '@/shared/guards/roles.guard';
 import { FilesService } from './files.service';
 import { ApiTags, ApiConsumes, ApiBearerAuth } from '@nestjs/swagger';
 import { DeleteFilesDto } from './dto/delete-files.dto';

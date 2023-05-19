@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { IUser } from '../../shared/interfaces/user.interface';
+import { IUser } from '@/shared/interfaces/user.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Task } from '../tasks/schemas/task.schema';

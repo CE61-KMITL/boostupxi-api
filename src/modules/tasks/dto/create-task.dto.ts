@@ -7,8 +7,8 @@ import {
   IsNotEmpty,
   IsOptional,
 } from 'class-validator';
-import { IFile } from 'src/shared/interfaces/file.interface';
-import { ITestCase } from 'src/shared/interfaces/testcase.interface';
+import { IFile } from '@/shared/interfaces/file.interface';
+import { ITestCase } from '@/shared/interfaces/testcase.interface';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateTaskDto {

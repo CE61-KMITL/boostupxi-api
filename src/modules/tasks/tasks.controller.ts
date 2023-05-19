@@ -12,15 +12,15 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { GetUser } from 'src/shared/decorators/get-user.decorator';
-import { Roles } from 'src/shared/decorators/roles.decorator';
-import { Role } from 'src/shared/enums/role.enum';
-import { JwtGuard } from 'src/shared/guards/jwt.guard';
-import { RolesGuard } from 'src/shared/guards/roles.guard';
+import { GetUser } from '@/shared/decorators/get-user.decorator';
+import { Roles } from '@/shared/decorators/roles.decorator';
+import { Role } from '@/shared/enums/role.enum';
+import { JwtGuard } from '@/shared/guards/jwt.guard';
+import { RolesGuard } from '@/shared/guards/roles.guard';
 import { TasksService } from '../tasks/tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
-import { IUser } from '../../shared/interfaces/user.interface';
-import { ITask } from 'src/shared/interfaces/task.interface';
+import { IUser } from '@/shared/interfaces/user.interface';
+import { ITask } from '@/shared/interfaces/task.interface';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { UpdateAuditTaskDto } from './dto/update-audit-task.dto';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';

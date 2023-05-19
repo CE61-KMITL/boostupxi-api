@@ -7,8 +7,8 @@ import {
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import configuration from 'src/config/configuration';
-import { LoggerMiddleware } from 'src/common/middleware/logger.middleware';
+import configuration from '@/config/configuration';
+import { LoggerMiddleware } from '@/common/middleware/logger.middleware';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserModule } from '../user/user.module';
 import { TasksModule } from '../tasks/tasks.module';
