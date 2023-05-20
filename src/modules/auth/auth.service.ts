@@ -6,7 +6,6 @@ import { IUser } from '@/shared/interfaces/user.interface';
 import { User } from '../user/schemas/user.schema';
 import { LoginDto } from './dto/login.dto';
 import * as Bcrypt from 'bcryptjs';
-import { Response } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -20,7 +19,7 @@ export class AuthService {
     return this.jwtService.sign(payload);
   }
 
-  async login(loginDto: LoginDto, res: Response) {
+  async login(loginDto: LoginDto) {
     const user = await this.userModel.findOne({ email: loginDto.email });
 
     if (!user) {
@@ -36,9 +35,6 @@ export class AuthService {
       throw new HttpException('INVALID_CREDENTIALS', HttpStatus.UNAUTHORIZED);
     }
 
-    const token = this.generateToken({ userId: user._id, role: user.role });
-
-    res.set('Authorization', token);
-    throw new HttpException('LOGIN_SUCCESS', HttpStatus.OK);
+    return this.generateToken({ userId: user._id, role: user.role });
   }
 }
