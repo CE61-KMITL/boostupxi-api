@@ -1,7 +1,7 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
 import { LeaderboardService } from './leaderboard.service';
 import { ApiTags } from '@nestjs/swagger';
-import { JwtGuard } from '@/shared/guards/jwt.guard';
+import { JwtGuard } from '@/common/guards/jwt.guard';
 
 @ApiTags('Leaderboard')
 @UseGuards(JwtGuard)

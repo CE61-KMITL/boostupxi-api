@@ -2,9 +2,9 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { IUser } from '@/shared/interfaces/user.interface';
-import { User } from '../user/schemas/user.schema';
-import { LoginDto } from './dto/login.dto';
+import { IUser } from '@/common/interfaces/user.interface';
+import { User } from '../users/schemas/user.schema';
+import { LoginDto } from './dtos/login.dto';
 import * as Bcrypt from 'bcryptjs';
 
 @Injectable()

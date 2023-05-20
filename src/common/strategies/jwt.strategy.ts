@@ -4,8 +4,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { PassportStrategy } from '@nestjs/passport';
 import { Model } from 'mongoose';
 import { Strategy, ExtractJwt } from 'passport-jwt';
-import { IUser } from '@/shared/interfaces/user.interface';
-import { User } from '@/modules/user/schemas/user.schema';
+import { IUser } from '@/common/interfaces/user.interface';
+import { User } from '@/modules/users/schemas/user.schema';
 import { IJwtPayload } from '../interfaces/jwt.interface';
 
 @Injectable()

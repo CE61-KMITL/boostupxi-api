@@ -2,16 +2,16 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Task } from './schemas/task.schema';
-import { ITask } from '@/shared/interfaces/task.interface';
-import { CreateTaskDto } from './dto/create-task.dto';
-import { IUser } from '@/shared/interfaces/user.interface';
+import { ITask } from '@/common/interfaces/task.interface';
+import { CreateTaskDto } from './dtos/create-task.dto';
+import { IUser } from '@/common/interfaces/user.interface';
 import { AwsService } from '../aws/aws.service';
-import { UpdateTaskDto } from './dto/update-task.dto';
-import { UpdateAuditTaskDto } from './dto/update-audit-task.dto';
-import { CreateCommentDto } from './dto/create-comment.dto';
-import { UpdateCommentDto } from './dto/update-comment.dto';
+import { UpdateTaskDto } from './dtos/update-task.dto';
+import { UpdateAuditTaskDto } from './dtos/update-audit-task.dto';
+import { CreateCommentDto } from './dtos/create-comment.dto';
+import { UpdateCommentDto } from './dtos/update-comment.dto';
 import { v4 as uuidv4 } from 'uuid';
-import { UpdateDraftTaskDto } from './dto/update-draft-task.dto';
+import { UpdateDraftTaskDto } from './dtos/update-draft-task.dto';
 
 @Injectable()
 export class TasksService {

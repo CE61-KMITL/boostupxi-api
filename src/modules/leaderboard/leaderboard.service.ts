@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { User } from '../user/schemas/user.schema';
+import { User } from '../users/schemas/user.schema';
 import { Model } from 'mongoose';
-import { IUser } from '@/shared/interfaces/user.interface';
+import { IUser } from '@/common/interfaces/user.interface';
 
 @Injectable()
 export class LeaderboardService {
