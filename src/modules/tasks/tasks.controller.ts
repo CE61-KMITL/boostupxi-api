@@ -12,21 +12,21 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { GetUser } from '@/shared/decorators/get-user.decorator';
-import { Roles } from '@/shared/decorators/roles.decorator';
-import { Role } from '@/shared/enums/role.enum';
-import { JwtGuard } from '@/shared/guards/jwt.guard';
-import { RolesGuard } from '@/shared/guards/roles.guard';
+import { GetUser } from '@/common/decorators/get-user.decorator';
+import { Roles } from '@/common/decorators/roles.decorator';
+import { Role } from '@/common/enums/role.enum';
+import { JwtGuard } from '@/common/guards/jwt.guard';
+import { RolesGuard } from '@/common/guards/roles.guard';
 import { TasksService } from '../tasks/tasks.service';
-import { CreateTaskDto } from './dto/create-task.dto';
-import { IUser } from '@/shared/interfaces/user.interface';
-import { ITask } from '@/shared/interfaces/task.interface';
-import { UpdateTaskDto } from './dto/update-task.dto';
-import { UpdateAuditTaskDto } from './dto/update-audit-task.dto';
+import { CreateTaskDto } from './dtos/create-task.dto';
+import { IUser } from '@/common/interfaces/user.interface';
+import { ITask } from '@/common/interfaces/task.interface';
+import { UpdateTaskDto } from './dtos/update-task.dto';
+import { UpdateAuditTaskDto } from './dtos/update-audit-task.dto';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
-import { CreateCommentDto } from './dto/create-comment.dto';
-import { UpdateCommentDto } from './dto/update-comment.dto';
-import { UpdateDraftTaskDto } from './dto/update-draft-task.dto';
+import { CreateCommentDto } from './dtos/create-comment.dto';
+import { UpdateCommentDto } from './dtos/update-comment.dto';
+import { UpdateDraftTaskDto } from './dtos/update-draft-task.dto';
 
 @ApiTags('Tasks')
 @ApiBearerAuth()

@@ -10,11 +10,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import configuration from '@/config/configuration';
 import { LoggerMiddleware } from '@/common/middleware/logger.middleware';
 import { MongooseModule } from '@nestjs/mongoose';
-import { UserModule } from '../user/user.module';
-import { TasksModule } from '../tasks/tasks.module';
-import { AuthModule } from '../auth/auth.module';
-import { FilesModule } from '../files/files.module';
-import { LeaderboardModule } from '../leaderboard/leaderboard.module';
+import { UsersModule } from '@/modules/users/users.module';
+import { TasksModule } from '@/modules/tasks/tasks.module';
+import { AuthModule } from '@/modules/auth/auth.module';
+import { FilesModule } from '@/modules/files/files.module';
+import { LeaderboardModule } from '@/modules/leaderboard/leaderboard.module';
 
 @Module({
   imports: [
@@ -30,7 +30,7 @@ import { LeaderboardModule } from '../leaderboard/leaderboard.module';
       }),
     }),
     AuthModule,
-    UserModule,
+    UsersModule,
     TasksModule,
     FilesModule,
     LeaderboardModule,
