@@ -1,7 +1,7 @@
 import { Body, Controller, Post, Res } from '@nestjs/common';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
-import { LoginDto } from './dto/login.dto';
+import { LoginDto } from './dtos/login.dto';
 import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Authentication')
@@ -11,6 +11,9 @@ export class AuthController {
 
   @Post('login')
   async login(@Body() loginDto: LoginDto, @Res() res: Response) {
-    return await this.authService.login(loginDto, res);
+    const token = await this.authService.login(loginDto);
+    return res.set('Authorization', token).send({
+      message: 'LOGIN_SUCCESS',
+    });
   }
 }

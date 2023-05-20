@@ -2,24 +2,25 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Task } from './schemas/task.schema';
-import { TaskI } from 'src/shared/interfaces/task.interface';
-import { CreateTaskDto } from './dto/create-task.dto';
-import { IUser } from '../../shared/interfaces/user.interface';
+import { ITask } from '@/common/interfaces/task.interface';
+import { CreateTaskDto } from './dtos/create-task.dto';
+import { IUser } from '@/common/interfaces/user.interface';
 import { AwsService } from '../aws/aws.service';
-import { UpdateTaskDto } from './dto/update-task.dto';
-import { UpdateAuditTaskDto } from './dto/update-audit-task.dto';
-import { CreateCommentDto } from './dto/create-comment.dto';
-import { UpdateCommentDto } from './dto/update-comment.dto';
+import { UpdateTaskDto } from './dtos/update-task.dto';
+import { UpdateAuditTaskDto } from './dtos/update-audit-task.dto';
+import { CreateCommentDto } from './dtos/create-comment.dto';
+import { UpdateCommentDto } from './dtos/update-comment.dto';
 import { v4 as uuidv4 } from 'uuid';
+import { UpdateDraftTaskDto } from './dtos/update-draft-task.dto';
 
 @Injectable()
 export class TasksService {
   constructor(
-    @InjectModel(Task.name) private readonly taskModel: Model<TaskI>,
+    @InjectModel(Task.name) private readonly taskModel: Model<ITask>,
     private awsService: AwsService,
   ) {}
 
-  async createTask(createTaskDto: CreateTaskDto, user: IUser): Promise<TaskI> {
+  async createTask(createTaskDto: CreateTaskDto, user: IUser): Promise<ITask> {
     const task = await this.taskModel.findOne({
       title: createTaskDto.title,
     });
@@ -55,7 +56,24 @@ export class TasksService {
     };
   }
 
-  async getTaskById(id: string): Promise<TaskI> {
+  async getFeedTasks(page = 1, limit = 25) {
+    const tasks = await this.taskModel
+      .find({ draft: false })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .exec();
+
+    const count = await this.taskModel.countDocuments({ draft: false });
+    const pages = Math.ceil(count / limit);
+
+    return {
+      currentPage: page,
+      pages,
+      data: tasks,
+    };
+  }
+
+  async getTaskById(id: string): Promise<ITask> {
     const task = await this.taskModel.findById(id);
 
     if (!task) {
@@ -72,7 +90,10 @@ export class TasksService {
       throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
     }
 
-    if (task.author.id.toString() !== user._id.toString()) {
+    if (
+      task.author.id.toString() !== user._id.toString() &&
+      user.role !== 'admin'
+    ) {
       throw new HttpException('UNAUTHORIZED', HttpStatus.UNAUTHORIZED);
     }
 
@@ -111,6 +132,22 @@ export class TasksService {
     }
   }
 
+  async draftTask(id: string, updateDraftTaskDto: UpdateDraftTaskDto) {
+    const task = await this.taskModel.findById(id);
+
+    if (!task) {
+      throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
+    }
+
+    const updatedTask = await this.taskModel.findByIdAndUpdate(
+      id,
+      updateDraftTaskDto,
+      { new: true },
+    );
+
+    return updatedTask;
+  }
+
   async deleteTask(id: string, user: IUser) {
     const task = await this.taskModel.findById(id);
 
@@ -118,7 +155,10 @@ export class TasksService {
       throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
     }
 
-    if (task.author.id.toString() !== user._id.toString()) {
+    if (
+      task.author.id.toString() !== user._id.toString() &&
+      user.role !== 'admin'
+    ) {
       throw new HttpException('UNAUTHORIZED', HttpStatus.UNAUTHORIZED);
     }
 
