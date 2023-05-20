@@ -36,6 +36,7 @@ async function bootstrap() {
     },
     methods: ['GET', 'POST', 'PATCH', 'DELETE'],
     optionsSuccessStatus: 200,
+    exposedHeaders: 'Authorization',
   });
 
   if (node_env !== 'production') {
