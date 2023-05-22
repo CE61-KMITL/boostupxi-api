@@ -12,11 +12,13 @@ import { CreateCommentDto } from './dtos/create-comment.dto';
 import { UpdateCommentDto } from './dtos/update-comment.dto';
 import { v4 as uuidv4 } from 'uuid';
 import { UpdateDraftTaskDto } from './dtos/update-draft-task.dto';
+import { User } from '../users/schemas/user.schema';
 
 @Injectable()
 export class TasksService {
   constructor(
     @InjectModel(Task.name) private readonly taskModel: Model<ITask>,
+    @InjectModel(User.name) private readonly userModel: Model<IUser>,
     private awsService: AwsService,
   ) {}
 
@@ -31,10 +33,7 @@ export class TasksService {
 
     const newTask = await this.taskModel.create({
       ...createTaskDto,
-      author: {
-        id: user._id,
-        username: user.username,
-      },
+      author: user._id,
     });
     return newTask;
   }
@@ -49,16 +48,43 @@ export class TasksService {
     const count = await this.taskModel.countDocuments();
     const pages = Math.ceil(count / limit);
 
+    const formattedTasks = tasks.map(async (task) => {
+      const user = await this.userModel.findById(task.author);
+
+      task.author = {
+        id: user._id,
+        username: user.username,
+      };
+
+      const comments = await Promise.all(
+        task.comments.map(async (comment) => {
+          const user = await this.userModel.findById(comment.author);
+
+          comment.author = {
+            id: user._id,
+            username: user.username,
+          };
+
+          return comment;
+        }),
+      );
+
+      task.comments = comments;
+
+      return task;
+    });
+
     return {
       currentPage: page,
       pages,
-      data: tasks,
+      data: await Promise.all(formattedTasks),
     };
   }
 
   async getFeedTasks(page = 1, limit = 25) {
     const tasks = await this.taskModel
       .find({ draft: false })
+      .select('-comments -solution_code -status -draft')
       .skip((page - 1) * limit)
       .limit(limit)
       .exec();
@@ -66,10 +92,21 @@ export class TasksService {
     const count = await this.taskModel.countDocuments({ draft: false });
     const pages = Math.ceil(count / limit);
 
+    const formattedTasks = tasks.map(async (task) => {
+      const user = await this.userModel.findById(task.author);
+
+      task.author = {
+        id: user._id,
+        username: user.username,
+      };
+
+      return task;
+    });
+
     return {
       currentPage: page,
       pages,
-      data: tasks,
+      data: await Promise.all(formattedTasks),
     };
   }
 
@@ -79,6 +116,28 @@ export class TasksService {
     if (!task) {
       throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
     }
+
+    const user = await this.userModel.findById(task.author);
+
+    task.author = {
+      id: user._id,
+      username: user.username,
+    };
+
+    const comments = await Promise.all(
+      task.comments.map(async (comment) => {
+        const user = await this.userModel.findById(comment.author);
+
+        comment.author = {
+          id: user._id,
+          username: user.username,
+        };
+
+        return comment;
+      }),
+    );
+
+    task.comments = comments;
 
     return task;
   }
@@ -181,10 +240,7 @@ export class TasksService {
 
     const newComment = {
       ...createCommentDto,
-      author: {
-        id: user._id,
-        username: user.username,
-      },
+      author: user._id,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       id: uuidv4(),
