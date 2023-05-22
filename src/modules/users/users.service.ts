@@ -16,7 +16,33 @@ export class UsersService {
   ) {}
 
   async getProfile(user: IUser) {
-    const tasks = await this.taskModel.find({ 'author.id': user._id });
+    const tasks = await this.taskModel.find({ author: user._id });
+
+    const formattedTasks = tasks.map(async (task) => {
+      const author = await this.userModel.findById(task.author);
+
+      task.author = {
+        id: author._id,
+        username: author.username,
+      };
+
+      const comments = await Promise.all(
+        task.comments.map(async (comment) => {
+          const user = await this.userModel.findById(comment.author);
+
+          comment.author = {
+            id: user._id,
+            username: user.username,
+          };
+
+          return comment;
+        }),
+      );
+
+      task.comments = comments;
+
+      return task;
+    });
 
     return {
       _id: user._id,
@@ -24,7 +50,7 @@ export class UsersService {
       username: user.username,
       score: user.score,
       role: user.role,
-      tasks,
+      tasks: await Promise.all(formattedTasks),
     };
   }
 
@@ -39,7 +65,7 @@ export class UsersService {
       throw new HttpException('USER_NOT_FOUND', HttpStatus.NOT_FOUND);
     }
 
-    if (updateUserDto.username) {
+    if (updateUserDto.username && user.username !== updateUserDto.username) {
       const usernameExists = await this.userModel.findOne({
         username: updateUserDto.username,
       });

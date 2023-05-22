@@ -4,10 +4,14 @@ import { TasksController } from './tasks.controller';
 import { Task, TaskSchema } from './schemas/task.schema';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AwsModule } from '../aws/aws.module';
+import { User, UserSchema } from '../users/schemas/user.schema';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Task.name, schema: TaskSchema }]),
+    MongooseModule.forFeature([
+      { name: Task.name, schema: TaskSchema },
+      { name: User.name, schema: UserSchema },
+    ]),
     AwsModule,
   ],
   controllers: [TasksController],
