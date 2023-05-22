@@ -42,7 +42,7 @@ export class TasksController {
     @Body() createTaskDto: CreateTaskDto,
     @GetUser() user: IUser,
   ) {
-    return await this.tasksService.createTask(createTaskDto, user);
+    return await this.tasksService.create(createTaskDto, user);
   }
 
   @Get()
@@ -82,7 +82,7 @@ export class TasksController {
     @Body() updateTaskDto: UpdateTaskDto,
     @GetUser() user: IUser,
   ) {
-    return await this.tasksService.updateTask(id, updateTaskDto, user);
+    return await this.tasksService.update(id, updateTaskDto, user);
   }
 
   @Patch('/:id/audit')

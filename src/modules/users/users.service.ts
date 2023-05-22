@@ -2,73 +2,88 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { IUser } from '@/common/interfaces/user.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Task } from '../tasks/schemas/task.schema';
-import { ITask } from '@/common/interfaces/task.interface';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { User } from './schemas/user.schema';
 import * as bcrypt from 'bcrypt';
+import { CreateUserDto } from './dtos/create-user.dto';
+import { TasksService } from '../tasks/tasks.service';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectModel(Task.name) private readonly taskModel: Model<ITask>,
     @InjectModel(User.name) private readonly userModel: Model<IUser>,
+    private tasksService: TasksService,
   ) {}
 
+  private async hashPassword(password: string): Promise<string> {
+    const salt = await bcrypt.genSalt();
+    return await bcrypt.hash(password, salt);
+  }
+
+  async findById(id: string): Promise<IUser> {
+    return this.userModel.findById(id);
+  }
+
+  async findOneByUsername(username: string): Promise<IUser> {
+    return this.userModel.findOne({ username });
+  }
+
+  async findOneByEmail(email: string): Promise<IUser> {
+    return this.userModel.findOne({ email });
+  }
+
+  async create(user: CreateUserDto): Promise<IUser> {
+    const userExist = await this.findOneByUsername(user.username);
+
+    if (userExist) {
+      throw new HttpException('USERNAME_EXISTS', HttpStatus.BAD_REQUEST);
+    }
+
+    const emailExist = await this.findOneByEmail(user.email);
+
+    if (emailExist) {
+      throw new HttpException('EMAIL_EXISTS', HttpStatus.BAD_REQUEST);
+    }
+
+    user.password = await this.hashPassword(user.password);
+
+    const newUser = await this.userModel.create(user);
+
+    return newUser;
+  }
+
   async getProfile(user: IUser) {
-    const tasks = await this.taskModel.find({ author: user._id });
+    const tasks = await this.tasksService.findByAuthor(user._id);
 
-    const formattedTasks = tasks.map(async (task) => {
-      const author = await this.userModel.findById(task.author);
-
-      task.author = {
-        id: author._id,
-        username: author.username,
-      };
-
-      const comments = await Promise.all(
-        task.comments.map(async (comment) => {
-          const user = await this.userModel.findById(comment.author);
-
-          comment.author = {
-            id: user._id,
-            username: user.username,
-          };
-
-          return comment;
-        }),
-      );
-
-      task.comments = comments;
-
-      return task;
-    });
+    const formattedTasks = tasks.map((task) =>
+      this.tasksService.formattedTaskData(task),
+    );
 
     return {
-      _id: user._id,
-      email: user.email,
-      username: user.username,
-      score: user.score,
-      role: user.role,
+      ...user.toJSON(),
       tasks: await Promise.all(formattedTasks),
     };
   }
 
-  async update(id: string, user: IUser, updateUserDto: UpdateUserDto) {
+  async update(
+    id: string,
+    user: IUser,
+    updateUserDto: UpdateUserDto,
+  ): Promise<IUser> {
     if (id !== user._id.toString()) {
       throw new HttpException('FORBIDDEN', HttpStatus.FORBIDDEN);
     }
 
-    const userExist = await this.userModel.findById(id);
+    const userExist = await this.findById(id);
 
     if (!userExist) {
       throw new HttpException('USER_NOT_FOUND', HttpStatus.NOT_FOUND);
     }
 
     if (updateUserDto.username && user.username !== updateUserDto.username) {
-      const usernameExists = await this.userModel.findOne({
-        username: updateUserDto.username,
-      });
+      const usernameExists = await this.findOneByUsername(
+        updateUserDto.username,
+      );
 
       if (usernameExists) {
         throw new HttpException('USERNAME_EXISTS', HttpStatus.BAD_REQUEST);
@@ -76,20 +91,17 @@ export class UsersService {
     }
 
     if (updateUserDto.password) {
-      const salt = await bcrypt.genSalt();
-      const hashedPassword = await bcrypt.hash(updateUserDto.password, salt);
-      updateUserDto.password = hashedPassword;
+      updateUserDto.password = await this.hashPassword(updateUserDto.password);
     }
 
-    const updatedUser = await this.userModel
-      .findByIdAndUpdate(
-        id,
-        { ...updateUserDto },
-        {
-          new: true,
-        },
-      )
-      .select('-password');
+    const updatedUser = await this.userModel.findByIdAndUpdate(
+      id,
+      { ...updateUserDto },
+      {
+        new: true,
+        select: '-password',
+      },
+    );
 
     return updatedUser;
   }

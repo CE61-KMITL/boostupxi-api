@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  Inject,
+  forwardRef,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Task } from './schemas/task.schema';
@@ -12,18 +18,30 @@ import { CreateCommentDto } from './dtos/create-comment.dto';
 import { UpdateCommentDto } from './dtos/update-comment.dto';
 import { v4 as uuidv4 } from 'uuid';
 import { UpdateDraftTaskDto } from './dtos/update-draft-task.dto';
-import { User } from '../users/schemas/user.schema';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class TasksService {
   constructor(
     @InjectModel(Task.name) private readonly taskModel: Model<ITask>,
-    @InjectModel(User.name) private readonly userModel: Model<IUser>,
+    @Inject(forwardRef(() => UsersService)) private usersService: UsersService,
     private awsService: AwsService,
   ) {}
 
+  async findByAuthor(author: string): Promise<ITask[]> {
+    return this.taskModel.find({ author });
+  }
+
+  async findOneByTitle(title: string): Promise<ITask> {
+    return this.taskModel.findOne({ title });
+  }
+
+  async findById(id: string): Promise<ITask> {
+    return this.taskModel.findById(id);
+  }
+
   async formattedTaskData(task: ITask): Promise<ITask> {
-    const user = await this.userModel.findById(task.author);
+    const user = await this.usersService.findById(task.author.toString());
 
     task.author = {
       id: user._id,
@@ -32,7 +50,9 @@ export class TasksService {
 
     const comments = await Promise.all(
       task.comments.map(async (comment) => {
-        const user = await this.userModel.findById(comment.author);
+        const user = await this.usersService.findById(
+          comment.author.toString(),
+        );
 
         comment.author = {
           id: user._id,
@@ -48,10 +68,8 @@ export class TasksService {
     return task;
   }
 
-  async createTask(createTaskDto: CreateTaskDto, user: IUser): Promise<ITask> {
-    const task = await this.taskModel.findOne({
-      title: createTaskDto.title,
-    });
+  async create(createTaskDto: CreateTaskDto, user: IUser): Promise<ITask> {
+    const task = await this.findOneByTitle(createTaskDto.title);
 
     if (task) {
       throw new HttpException('TASK_EXISTED', HttpStatus.BAD_REQUEST);
@@ -84,7 +102,7 @@ export class TasksService {
   }
 
   async getTaskById(id: string): Promise<ITask> {
-    const task = await this.taskModel.findById(id);
+    const task = await this.findById(id);
 
     if (!task) {
       throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
@@ -93,8 +111,8 @@ export class TasksService {
     return this.formattedTaskData(task);
   }
 
-  async updateTask(id: string, updateTaskDto: UpdateTaskDto, user: IUser) {
-    const task = await this.taskModel.findById(id);
+  async update(id: string, updateTaskDto: UpdateTaskDto, user: IUser) {
+    const task = await this.findById(id);
 
     if (!task) {
       throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
@@ -121,7 +139,7 @@ export class TasksService {
     updateAuditTaskDto: UpdateAuditTaskDto,
     user: IUser,
   ) {
-    const task = await this.taskModel.findById(id);
+    const task = await this.findById(id);
 
     if (!task) {
       throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
@@ -143,7 +161,7 @@ export class TasksService {
   }
 
   async draftTask(id: string, updateDraftTaskDto: UpdateDraftTaskDto) {
-    const task = await this.taskModel.findById(id);
+    const task = await this.findById(id);
 
     if (!task) {
       throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
@@ -159,7 +177,7 @@ export class TasksService {
   }
 
   async deleteTask(id: string, user: IUser) {
-    const task = await this.taskModel.findById(id);
+    const task = await this.findById(id);
 
     if (!task) {
       throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
@@ -183,7 +201,7 @@ export class TasksService {
     user: IUser,
     createCommentDto: CreateCommentDto,
   ) {
-    const task = await this.taskModel.findById(id);
+    const task = await this.findById(id);
 
     if (!task) {
       throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
@@ -207,7 +225,7 @@ export class TasksService {
   }
 
   async deleteComment(id: string, user: IUser, commentId: string) {
-    const task = await this.taskModel.findById(id);
+    const task = await this.findById(id);
 
     if (!task) {
       throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
@@ -244,7 +262,7 @@ export class TasksService {
     updateCommentDto: UpdateCommentDto,
     commentId: string,
   ) {
-    const task = await this.taskModel.findById(id);
+    const task = await this.findById(id);
 
     if (!task) {
       throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
