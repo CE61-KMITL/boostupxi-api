@@ -150,7 +150,7 @@ export class TasksService {
     }
 
     if (
-      task.author.id.toString() !== user._id.toString() &&
+      task.author.toString() !== user._id.toString() &&
       user.role !== 'admin'
     ) {
       throw new HttpException('UNAUTHORIZED', HttpStatus.UNAUTHORIZED);
@@ -176,7 +176,7 @@ export class TasksService {
       throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
     }
 
-    if (task.author.id.toString() !== user._id.toString()) {
+    if (task.author.toString() !== user._id.toString()) {
       const updatedTask = await this.taskModel.findByIdAndUpdate(
         id,
         updateAuditTaskDto,
@@ -215,7 +215,7 @@ export class TasksService {
     }
 
     if (
-      task.author.id.toString() !== user._id.toString() &&
+      task.author.toString() !== user._id.toString() &&
       user.role !== 'admin'
     ) {
       throw new HttpException('UNAUTHORIZED', HttpStatus.UNAUTHORIZED);
@@ -270,7 +270,7 @@ export class TasksService {
       throw new HttpException('COMMENT_NOT_FOUND', HttpStatus.NOT_FOUND);
     }
 
-    if (comment.author.id.toString() !== user._id.toString()) {
+    if (comment.author.toString() !== user._id.toString()) {
       throw new HttpException('UNAUTHORIZED', HttpStatus.UNAUTHORIZED);
     }
 
@@ -307,7 +307,7 @@ export class TasksService {
       throw new HttpException('COMMENT_NOT_FOUND', HttpStatus.NOT_FOUND);
     }
 
-    if (comment.author.id.toString() !== user._id.toString()) {
+    if (comment.author.toString() !== user._id.toString()) {
       throw new HttpException('UNAUTHORIZED', HttpStatus.UNAUTHORIZED);
     }
 
