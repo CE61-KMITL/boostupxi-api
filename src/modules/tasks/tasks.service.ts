@@ -22,6 +22,32 @@ export class TasksService {
     private awsService: AwsService,
   ) {}
 
+  async formattedTaskData(task: ITask): Promise<ITask> {
+    const user = await this.userModel.findById(task.author);
+
+    task.author = {
+      id: user._id,
+      username: user.username,
+    };
+
+    const comments = await Promise.all(
+      task.comments.map(async (comment) => {
+        const user = await this.userModel.findById(comment.author);
+
+        comment.author = {
+          id: user._id,
+          username: user.username,
+        };
+
+        return comment;
+      }),
+    );
+
+    task.comments = comments;
+
+    return task;
+  }
+
   async createTask(createTaskDto: CreateTaskDto, user: IUser): Promise<ITask> {
     const task = await this.taskModel.findOne({
       title: createTaskDto.title,
@@ -48,60 +74,7 @@ export class TasksService {
     const count = await this.taskModel.countDocuments();
     const pages = Math.ceil(count / limit);
 
-    const formattedTasks = tasks.map(async (task) => {
-      const user = await this.userModel.findById(task.author);
-
-      task.author = {
-        id: user._id,
-        username: user.username,
-      };
-
-      const comments = await Promise.all(
-        task.comments.map(async (comment) => {
-          const user = await this.userModel.findById(comment.author);
-
-          comment.author = {
-            id: user._id,
-            username: user.username,
-          };
-
-          return comment;
-        }),
-      );
-
-      task.comments = comments;
-
-      return task;
-    });
-
-    return {
-      currentPage: page,
-      pages,
-      data: await Promise.all(formattedTasks),
-    };
-  }
-
-  async getFeedTasks(page = 1, limit = 25) {
-    const tasks = await this.taskModel
-      .find({ draft: false })
-      .select('-comments -solution_code -status -draft')
-      .skip((page - 1) * limit)
-      .limit(limit)
-      .exec();
-
-    const count = await this.taskModel.countDocuments({ draft: false });
-    const pages = Math.ceil(count / limit);
-
-    const formattedTasks = tasks.map(async (task) => {
-      const user = await this.userModel.findById(task.author);
-
-      task.author = {
-        id: user._id,
-        username: user.username,
-      };
-
-      return task;
-    });
+    const formattedTasks = tasks.map((task) => this.formattedTaskData(task));
 
     return {
       currentPage: page,
@@ -117,29 +90,7 @@ export class TasksService {
       throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
     }
 
-    const user = await this.userModel.findById(task.author);
-
-    task.author = {
-      id: user._id,
-      username: user.username,
-    };
-
-    const comments = await Promise.all(
-      task.comments.map(async (comment) => {
-        const user = await this.userModel.findById(comment.author);
-
-        comment.author = {
-          id: user._id,
-          username: user.username,
-        };
-
-        return comment;
-      }),
-    );
-
-    task.comments = comments;
-
-    return task;
+    return this.formattedTaskData(task);
   }
 
   async updateTask(id: string, updateTaskDto: UpdateTaskDto, user: IUser) {
