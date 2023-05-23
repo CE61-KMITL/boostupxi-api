@@ -1,38 +1,39 @@
-# CE BoostUp XI Backend
+# CE BoostUp XI - API
 
-## Installation
+CE BoostUp XI API is a RESTful API for CE BoostUp XI website. It is built with NodeJS and NestJS framework.
 
-```
-$ pnpm install
-```
+## Requirements
 
-## Running the app
+- [Docker](https://docs.docker.com/get-docker/)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+- [NodeJS](https://nodejs.org/en/download/)
+- [NPM](https://www.npmjs.com/get-npm)
 
-```
-# development
-$ npm run start
+## Development
 
-# watch mode
-$ npm run start:dev
+- Install dependencies
 
-# production mode
-$ npm run start:prod
+```bash
+npm install
 ```
 
-## Test
+- Run with NodeJS
 
-```
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+```bash
+npm run dev
 ```
 
-## Docker
+- Run with Docker
+
+```bash
+docker-compose up -d
 ```
-docker compose up
+
+## Deploy
+
+- Run with Docker
+
+```bash
+docker build -t ceboostup-xi .
+docker run -d --env-file=.env --name ceboostup-xi -p 5050:5050 ceboostup-xi
 ```
