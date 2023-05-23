@@ -1,29 +1,75 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  Inject,
+  forwardRef,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Task } from './schemas/task.schema';
-import { TaskI } from 'src/shared/interfaces/task.interface';
-import { CreateTaskDto } from './dto/create-task.dto';
-import { IUser } from '../../shared/interfaces/user.interface';
-import { Role } from 'src/shared/enums/role.enum';
+import { ITask } from '@/common/interfaces/task.interface';
+import { CreateTaskDto } from './dtos/create-task.dto';
+import { IUser } from '@/common/interfaces/user.interface';
 import { AwsService } from '../aws/aws.service';
-import { UpdateTaskDto } from './dto/update-task.dto';
-import { UpdateAuditTaskDto } from './dto/update-audit-task.dto';
-import { CreateCommentDto } from './dto/create-comment.dto';
-import { UpdateCommentDto } from './dto/update-comment.dto';
+import { UpdateTaskDto } from './dtos/update-task.dto';
+import { UpdateAuditTaskDto } from './dtos/update-audit-task.dto';
+import { CreateCommentDto } from './dtos/create-comment.dto';
+import { UpdateCommentDto } from './dtos/update-comment.dto';
 import { v4 as uuidv4 } from 'uuid';
+import { UpdateDraftTaskDto } from './dtos/update-draft-task.dto';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class TasksService {
   constructor(
-    @InjectModel(Task.name) private readonly taskModel: Model<TaskI>,
+    @InjectModel(Task.name) private readonly taskModel: Model<ITask>,
+    @Inject(forwardRef(() => UsersService)) private usersService: UsersService,
     private awsService: AwsService,
   ) {}
 
-  async createTask(createTaskDto: CreateTaskDto, user: IUser): Promise<TaskI> {
-    const task = await this.taskModel.findOne({
-      title: createTaskDto.title,
-    });
+  async findByAuthor(author: string): Promise<ITask[]> {
+    return this.taskModel.find({ author });
+  }
+
+  async findOneByTitle(title: string): Promise<ITask> {
+    return this.taskModel.findOne({ title });
+  }
+
+  async findById(id: string): Promise<ITask> {
+    return this.taskModel.findById(id);
+  }
+
+  async formattedTaskData(task: ITask): Promise<ITask> {
+    const user = await this.usersService.findById(task.author.toString());
+
+    task.author = {
+      id: user._id,
+      username: user.username,
+    };
+
+    const comments = await Promise.all(
+      task.comments.map(async (comment) => {
+        const user = await this.usersService.findById(
+          comment.author.toString(),
+        );
+
+        comment.author = {
+          id: user._id,
+          username: user.username,
+        };
+
+        return comment;
+      }),
+    );
+
+    task.comments = comments;
+
+    return task;
+  }
+
+  async create(createTaskDto: CreateTaskDto, user: IUser): Promise<ITask> {
+    const task = await this.findOneByTitle(createTaskDto.title);
 
     if (task) {
       throw new HttpException('TASK_EXISTED', HttpStatus.BAD_REQUEST);
@@ -31,10 +77,7 @@ export class TasksService {
 
     const newTask = await this.taskModel.create({
       ...createTaskDto,
-      author: {
-        id: user._id,
-        username: user.username,
-      },
+      author: user._id,
     });
     return newTask;
   }
@@ -49,28 +92,37 @@ export class TasksService {
     const count = await this.taskModel.countDocuments();
     const pages = Math.ceil(count / limit);
 
+    const formattedTasks = tasks.map((task) => this.formattedTaskData(task));
+
     return {
       currentPage: page,
       pages,
-      data: tasks,
+      data: await Promise.all(formattedTasks),
     };
   }
 
-  async getTaskById(id: string): Promise<TaskI> {
-    const task = await this.taskModel.findById(id);
+  async getTaskById(id: string): Promise<ITask> {
+    const task = await this.findById(id);
 
     if (!task) {
       throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
     }
 
-    return task;
+    return this.formattedTaskData(task);
   }
 
-  async updateTask(id: string, updateTaskDto: UpdateTaskDto) {
-    const task = await this.taskModel.findById(id);
+  async update(id: string, updateTaskDto: UpdateTaskDto, user: IUser) {
+    const task = await this.findById(id);
 
     if (!task) {
       throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
+    }
+
+    if (
+      task.author.toString() !== user._id.toString() &&
+      user.role !== 'admin'
+    ) {
+      throw new HttpException('UNAUTHORIZED', HttpStatus.UNAUTHORIZED);
     }
 
     const updatedTask = await this.taskModel.findByIdAndUpdate(
@@ -82,8 +134,34 @@ export class TasksService {
     return updatedTask;
   }
 
-  async auditTask(id: string, updateAuditTaskDto: UpdateAuditTaskDto) {
-    const task = await this.taskModel.findById(id);
+  async auditTask(
+    id: string,
+    updateAuditTaskDto: UpdateAuditTaskDto,
+    user: IUser,
+  ) {
+    const task = await this.findById(id);
+
+    if (!task) {
+      throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
+    }
+
+    if (task.author.toString() !== user._id.toString()) {
+      const updatedTask = await this.taskModel.findByIdAndUpdate(
+        id,
+        updateAuditTaskDto,
+        { new: true },
+      );
+      return updatedTask;
+    } else {
+      throw new HttpException(
+        'CAN_NOT_AUDIT_YOUR_OWN_TASK',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  async draftTask(id: string, updateDraftTaskDto: UpdateDraftTaskDto) {
+    const task = await this.findById(id);
 
     if (!task) {
       throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
@@ -91,7 +169,7 @@ export class TasksService {
 
     const updatedTask = await this.taskModel.findByIdAndUpdate(
       id,
-      updateAuditTaskDto,
+      updateDraftTaskDto,
       { new: true },
     );
 
@@ -99,19 +177,23 @@ export class TasksService {
   }
 
   async deleteTask(id: string, user: IUser) {
-    const task = await this.taskModel.findById(id);
-    if (
-      task &&
-      (user.role === Role.Auditor ||
-        (user.role === Role.Staff &&
-          task.author.id.toString() === user._id.toString()))
-    ) {
-      const keys = task.files.map((file) => ({ key: file.key }));
-      await this.awsService.deleteFiles(keys);
-      await this.taskModel.findByIdAndDelete(id);
-      throw new HttpException('TASK_DELETED', HttpStatus.OK);
+    const task = await this.findById(id);
+
+    if (!task) {
+      throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
     }
-    throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
+
+    if (
+      task.author.toString() !== user._id.toString() &&
+      user.role !== 'admin'
+    ) {
+      throw new HttpException('UNAUTHORIZED', HttpStatus.UNAUTHORIZED);
+    }
+
+    const keys = task.files.map((file) => ({ key: file.key }));
+    await this.awsService.deleteFiles(keys);
+    await this.taskModel.findByIdAndDelete(id);
+    throw new HttpException('TASK_DELETED', HttpStatus.OK);
   }
 
   async createComment(
@@ -119,24 +201,17 @@ export class TasksService {
     user: IUser,
     createCommentDto: CreateCommentDto,
   ) {
-    const task = await this.taskModel.findById(id);
+    const task = await this.findById(id);
 
     if (!task) {
       throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
     }
 
-    const date = new Date();
-
-    date.setHours(date.getHours() + 7);
-
     const newComment = {
       ...createCommentDto,
-      author: {
-        id: user._id,
-        username: user.username,
-      },
-      createdAt: date.toISOString(),
-      updatedAt: date.toISOString(),
+      author: user._id,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
       id: uuidv4(),
     };
 
@@ -150,7 +225,7 @@ export class TasksService {
   }
 
   async deleteComment(id: string, user: IUser, commentId: string) {
-    const task = await this.taskModel.findById(id);
+    const task = await this.findById(id);
 
     if (!task) {
       throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
@@ -164,7 +239,7 @@ export class TasksService {
       throw new HttpException('COMMENT_NOT_FOUND', HttpStatus.NOT_FOUND);
     }
 
-    if (comment.author.id.toString() !== user._id.toString()) {
+    if (comment.author.toString() !== user._id.toString()) {
       throw new HttpException('UNAUTHORIZED', HttpStatus.UNAUTHORIZED);
     }
 
@@ -187,7 +262,7 @@ export class TasksService {
     updateCommentDto: UpdateCommentDto,
     commentId: string,
   ) {
-    const task = await this.taskModel.findById(id);
+    const task = await this.findById(id);
 
     if (!task) {
       throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
@@ -201,20 +276,16 @@ export class TasksService {
       throw new HttpException('COMMENT_NOT_FOUND', HttpStatus.NOT_FOUND);
     }
 
-    if (comment.author.id.toString() !== user._id.toString()) {
+    if (comment.author.toString() !== user._id.toString()) {
       throw new HttpException('UNAUTHORIZED', HttpStatus.UNAUTHORIZED);
     }
-
-    const date = new Date();
-
-    date.setHours(date.getHours() + 7);
 
     const updatedComment = await this.taskModel.findByIdAndUpdate(
       id,
       {
         $set: {
           'comments.$[comment].message': updateCommentDto.message,
-          'comments.$[comment].updatedAt': date.toISOString(),
+          'comments.$[comment].updatedAt': new Date().toISOString(),
         },
       },
       {

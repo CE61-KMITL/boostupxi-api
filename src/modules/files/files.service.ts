@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { AwsService } from '../aws/aws.service';
-import { DeleteFilesDto } from './dto/delete-files.dto';
+import { DeleteFilesDto } from './dtos/delete-files.dto';
 
 @Injectable()
 export class FilesService {

@@ -1,27 +1,30 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { IUser } from 'src/shared/interfaces/user.interface';
-import { User } from '../user/schemas/user.schema';
-import { LoginDto } from './dto/login.dto';
+import { LoginDto } from './dtos/login.dto';
 import * as Bcrypt from 'bcryptjs';
-import { Response } from 'express';
+import { UsersService } from '../users/users.service';
+import { RegisterDto } from './dtos/register.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectModel(User.name) private readonly userModel: Model<IUser>,
+    private usersService: UsersService,
     private jwtService: JwtService,
   ) {}
 
-  generateToken({ userId, role }: { userId: string; role: string }): string {
+  private generateToken({
+    userId,
+    role,
+  }: {
+    userId: string;
+    role: string;
+  }): string {
     const payload = { sub: userId, role };
     return this.jwtService.sign(payload);
   }
 
-  async login(loginDto: LoginDto, res: Response) {
-    const user = await this.userModel.findOne({ email: loginDto.email });
+  async login(loginDto: LoginDto): Promise<string> {
+    const user = await this.usersService.findOneByEmail(loginDto.email);
 
     if (!user) {
       throw new HttpException('USER_NOT_FOUND', HttpStatus.NOT_FOUND);
@@ -36,9 +39,11 @@ export class AuthService {
       throw new HttpException('INVALID_CREDENTIALS', HttpStatus.UNAUTHORIZED);
     }
 
-    const token = this.generateToken({ userId: user._id, role: user.role });
+    return this.generateToken({ userId: user._id, role: user.role });
+  }
 
-    res.set('Authorization', token);
-    throw new HttpException('LOGIN_SUCCESS', HttpStatus.OK);
+  async register(registerDto: RegisterDto): Promise<string> {
+    const newUser = await this.usersService.create(registerDto);
+    return this.generateToken({ userId: newUser._id, role: newUser.role });
   }
 }

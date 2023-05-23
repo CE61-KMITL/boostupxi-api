@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './modules/app/app.module';
+import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -36,6 +36,7 @@ async function bootstrap() {
     },
     methods: ['GET', 'POST', 'PATCH', 'DELETE'],
     optionsSuccessStatus: 200,
+    exposedHeaders: 'Authorization',
   });
 
   if (node_env !== 'production') {
