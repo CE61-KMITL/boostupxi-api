@@ -20,7 +20,7 @@ npm install
 - Run with NodeJS
 
 ```bash
-npm run dev
+npm run start:dev
 ```
 
 - Run with Docker
