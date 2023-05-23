@@ -32,26 +32,6 @@ export class UsersService {
     return this.userModel.findOne({ email });
   }
 
-  async create(user: CreateUserDto): Promise<IUser> {
-    const userExist = await this.findOneByUsername(user.username);
-
-    if (userExist) {
-      throw new HttpException('USERNAME_EXISTS', HttpStatus.BAD_REQUEST);
-    }
-
-    const emailExist = await this.findOneByEmail(user.email);
-
-    if (emailExist) {
-      throw new HttpException('EMAIL_EXISTS', HttpStatus.BAD_REQUEST);
-    }
-
-    user.password = await this.hashPassword(user.password);
-
-    const newUser = await this.userModel.create(user);
-
-    return newUser;
-  }
-
   async getProfile(user: IUser) {
     const tasks = await this.tasksService.findByAuthor(user._id);
 
