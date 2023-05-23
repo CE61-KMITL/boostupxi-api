@@ -42,7 +42,7 @@ export class TasksController {
     @Body() createTaskDto: CreateTaskDto,
     @GetUser() user: IUser,
   ) {
-    return await this.tasksService.createTask(createTaskDto, user);
+    return await this.tasksService.create(createTaskDto, user);
   }
 
   @Get()
@@ -67,27 +67,6 @@ export class TasksController {
     return await this.tasksService.getTasks(page, limit);
   }
 
-  @Get('/feed')
-  @UseGuards(JwtGuard)
-  async getFeedTasks(
-    @Query(
-      'page',
-      new ParseIntPipe({
-        errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE,
-      }),
-    )
-    page: number,
-    @Query(
-      'limit',
-      new ParseIntPipe({
-        errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE,
-      }),
-    )
-    limit: number,
-  ) {
-    return await this.tasksService.getFeedTasks(page, limit);
-  }
-
   @Get('/:id')
   @Roles(Role.Auditor, Role.Staff, Role.Admin)
   @UseGuards(JwtGuard, RolesGuard)
@@ -103,7 +82,7 @@ export class TasksController {
     @Body() updateTaskDto: UpdateTaskDto,
     @GetUser() user: IUser,
   ) {
-    return await this.tasksService.updateTask(id, updateTaskDto, user);
+    return await this.tasksService.update(id, updateTaskDto, user);
   }
 
   @Patch('/:id/audit')
