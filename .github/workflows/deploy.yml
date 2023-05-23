@@ -11,7 +11,35 @@ jobs:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v3
-      - name: Build Docker image
-        run: docker build . --file Dockerfile --tag ceboostxi-api
-      - name: Run Docker image
-        run: docker run -d -e PORT='${{ secrets.PORT }}' -e MONGO_URI='${{ secrets.MONGO_URI }}' -e ALLOWED_ORIGINS='${{ secrets.ALLOWED_ORIGINS }}' -e JWT_SECRET='${{ secrets.JWT_SECRET }}' -e NODE_ENV='production' -e AWS_BUCKET='${{ secrets.AWS_BUCKET }}' -e AWS_ACCESS_KEY_ID='${{ secrets.AWS_ACCESS_KEY_ID }}' -e AWS_SECRET_ACCESS_KEY='${{ secrets.AWS_SECRET_ACCESS_KEY }}' -e AWS_REGION='${{ secrets.AWS_REGION }}' -p 5050:5050 ceboostxi-api
+      - name: Build and Deploy
+        env:
+          PORT: ${{ secrets.PORT }}
+          MONGO_URI: ${{ secrets.MONGO_URI }}
+          ALLOWED_ORIGINS: ${{ secrets.ALLOWED_ORIGINS }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          NODE_ENV: 'production'
+          AWS_BUCKET: ${{ secrets.AWS_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+        run: |
+          docker build --no-cache . \
+            --file Dockerfile \
+            --tag ceboostxi-api
+
+          docker stop ceboostxi-api || true
+          docker rm ceboostxi-api || true
+
+          docker run -d \
+            -e PORT=$PORT \
+            -e MONGO_URI=$MONGO_URI \
+            -e ALLOWED_ORIGINS=$ALLOWED_ORIGINS \
+            -e JWT_SECRET=$JWT_SECRET \
+            -e NODE_ENV=$NODE_ENV \
+            -e AWS_BUCKET=$AWS_BUCKET \
+            -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+            -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+            -e AWS_REGION=$AWS_REGION \
+            -p 5050:5050 \
+            --name ceboostxi-api \
+            ceboostxi-api
