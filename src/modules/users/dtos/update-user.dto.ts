@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString, MinLength } from 'class-validator';
+import { IsOptional, IsString, Matches, MinLength } from 'class-validator';
 
 export class UpdateUserDto {
   @ApiProperty({
@@ -8,6 +8,7 @@ export class UpdateUserDto {
   })
   @IsString()
   @IsOptional()
+  @Matches(/^[a-zA-Z0-9_]+$/, { message: 'Username must be alphanumeric.' })
   readonly username: string;
 
   @ApiProperty({

@@ -75,6 +75,8 @@ export class TasksService {
       throw new HttpException('TASK_EXISTED', HttpStatus.BAD_REQUEST);
     }
 
+    console.log(createTaskDto.solution_code);
+
     const newTask = await this.taskModel.create({
       ...createTaskDto,
       author: user._id,
@@ -165,6 +167,10 @@ export class TasksService {
 
     if (!task) {
       throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
+    }
+
+    if (task.status !== 'approved') {
+      throw new HttpException('TASK_NOT_APPROVED', HttpStatus.BAD_REQUEST);
     }
 
     const updatedTask = await this.taskModel.findByIdAndUpdate(
