@@ -44,7 +44,6 @@ export class TasksService {
     const user = await this.usersService.findById(task.author.toString());
 
     task.author = {
-      id: user._id,
       username: user.username,
     };
 
@@ -55,7 +54,6 @@ export class TasksService {
         );
 
         comment.author = {
-          id: user._id,
           username: user.username,
         };
 
