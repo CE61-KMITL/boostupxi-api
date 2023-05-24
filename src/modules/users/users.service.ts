@@ -5,7 +5,6 @@ import { Model } from 'mongoose';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { User } from './schemas/user.schema';
 import * as bcrypt from 'bcrypt';
-import { CreateUserDto } from './dtos/create-user.dto';
 import { TasksService } from '../tasks/tasks.service';
 
 @Injectable()
