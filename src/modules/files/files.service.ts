@@ -7,6 +7,16 @@ export class FilesService {
   constructor(private awsService: AwsService) {}
 
   async uploadFiles(files: Express.Multer.File[]) {
+    const regex = /^boostup_[a-zA-Z0-9_]+\.(png|jpeg|jpg|zip)$/;
+    const invalidFiles = files.filter((file) => !regex.test(file.originalname));
+
+    if (invalidFiles.length > 0) {
+      throw new HttpException(
+        `INVALID_FILE_NAME`,
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
+    }
+
     const uploadedFiles = await this.awsService.uploadFiles(files);
     return uploadedFiles;
   }
