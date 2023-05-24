@@ -5,7 +5,6 @@ export interface IComment {
   author:
     | Types.ObjectId
     | {
-        id: Types.ObjectId;
         username: string;
       };
   createdAt: Date;
