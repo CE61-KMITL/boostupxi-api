@@ -5,7 +5,6 @@ import { Model } from 'mongoose';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { User } from './schemas/user.schema';
 import * as bcrypt from 'bcrypt';
-import { CreateUserDto } from './dtos/create-user.dto';
 import { TasksService } from '../tasks/tasks.service';
 
 @Injectable()
@@ -74,7 +73,7 @@ export class UsersService {
       updateUserDto.password = await this.hashPassword(updateUserDto.password);
     }
 
-    const updatedUser = await this.userModel.findByIdAndUpdate(
+    await this.userModel.findByIdAndUpdate(
       id,
       { ...updateUserDto },
       {
@@ -83,6 +82,6 @@ export class UsersService {
       },
     );
 
-    return updatedUser;
+    throw new HttpException('USER_UPDATED', HttpStatus.OK);
   }
 }
