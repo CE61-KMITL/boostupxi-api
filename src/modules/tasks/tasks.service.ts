@@ -73,13 +73,11 @@ export class TasksService {
       throw new HttpException('TASK_EXISTED', HttpStatus.BAD_REQUEST);
     }
 
-    console.log(createTaskDto.solution_code);
-
-    const newTask = await this.taskModel.create({
+    await this.taskModel.create({
       ...createTaskDto,
       author: user._id,
     });
-    return newTask;
+    throw new HttpException('TASK_CREATED', HttpStatus.CREATED);
   }
 
   async getTasks(page = 1, limit = 25) {
@@ -125,13 +123,9 @@ export class TasksService {
       throw new HttpException('UNAUTHORIZED', HttpStatus.UNAUTHORIZED);
     }
 
-    const updatedTask = await this.taskModel.findByIdAndUpdate(
-      id,
-      updateTaskDto,
-      { new: true },
-    );
+    await this.taskModel.findByIdAndUpdate(id, updateTaskDto, { new: true });
 
-    return updatedTask;
+    throw new HttpException('TASK_UPDATED', HttpStatus.OK);
   }
 
   async auditTask(
@@ -146,12 +140,10 @@ export class TasksService {
     }
 
     if (task.author.toString() !== user._id.toString()) {
-      const updatedTask = await this.taskModel.findByIdAndUpdate(
-        id,
-        updateAuditTaskDto,
-        { new: true },
-      );
-      return updatedTask;
+      await this.taskModel.findByIdAndUpdate(id, updateAuditTaskDto, {
+        new: true,
+      });
+      throw new HttpException('TASK_AUDITED', HttpStatus.OK);
     } else {
       throw new HttpException(
         'CAN_NOT_AUDIT_YOUR_OWN_TASK',
@@ -171,13 +163,11 @@ export class TasksService {
       throw new HttpException('TASK_NOT_APPROVED', HttpStatus.BAD_REQUEST);
     }
 
-    const updatedTask = await this.taskModel.findByIdAndUpdate(
-      id,
-      updateDraftTaskDto,
-      { new: true },
-    );
+    await this.taskModel.findByIdAndUpdate(id, updateDraftTaskDto, {
+      new: true,
+    });
 
-    return updatedTask;
+    throw new HttpException('TASK_DRAFTED', HttpStatus.OK);
   }
 
   async deleteTask(id: string, user: IUser) {
@@ -219,13 +209,13 @@ export class TasksService {
       id: uuidv4(),
     };
 
-    const updatedTask = await this.taskModel.findByIdAndUpdate(
+    await this.taskModel.findByIdAndUpdate(
       id,
       { $push: { comments: newComment } },
       { new: true },
     );
 
-    return updatedTask;
+    throw new HttpException('COMMENT_CREATED', HttpStatus.OK);
   }
 
   async deleteComment(id: string, user: IUser, commentId: string) {
@@ -284,7 +274,7 @@ export class TasksService {
       throw new HttpException('UNAUTHORIZED', HttpStatus.UNAUTHORIZED);
     }
 
-    const updatedComment = await this.taskModel.findByIdAndUpdate(
+    await this.taskModel.findByIdAndUpdate(
       id,
       {
         $set: {
@@ -298,6 +288,6 @@ export class TasksService {
       },
     );
 
-    return updatedComment;
+    throw new HttpException('COMMENT_UPDATED', HttpStatus.OK);
   }
 }
