@@ -11,7 +11,6 @@ export interface ITask extends Document {
   author:
     | Types.ObjectId
     | {
-        id: Types.ObjectId;
         username: string;
       };
   level: number;
