@@ -1,8 +1,13 @@
-import { IAuthor } from './task.interface';
+import { Types } from 'mongoose';
 
 export interface IComment {
   message: string;
-  author: IAuthor;
+  author:
+    | Types.ObjectId
+    | {
+        id: Types.ObjectId;
+        username: string;
+      };
   createdAt: Date;
   updatedAt: Date;
   id: string;

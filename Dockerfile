@@ -1,11 +1,23 @@
-FROM node:14.15 AS development
+# Base image
+FROM node:18
 
-#  Navigate to the container working directory 
+# Create app directory
 WORKDIR /usr/src/app
-#  Copy package.json
+
+# A wildcard is used to ensure both package.json AND package-lock.json are copied
 COPY package*.json ./
 
-RUN npm install glob rimraf
+# Install app dependencies
 RUN npm install
+
+# Bundle app source
 COPY . .
+
+# Creates a "dist" folder with the production build
 RUN npm run build
+
+# Start the server using the production build
+CMD [ "node", "dist/main.js" ]
+
+# Expose the port the app runs in
+EXPOSE 5050

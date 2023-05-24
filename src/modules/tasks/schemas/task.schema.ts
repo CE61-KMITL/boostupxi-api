@@ -1,16 +1,10 @@
-import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { IFile } from '@/common/interfaces/file.interface';
 import { StatusType } from '@/common/interfaces/task.interface';
 import { ITestCase } from '@/common/interfaces/testcase.interface';
 import { TaskStatus } from '../../../common/enums/task-status.enum';
-import { IAuthor } from '@/common/interfaces/task.interface';
 import { IComment } from '@/common/interfaces/comment.interface';
-
-const AuthorSchema = raw({
-  id: { type: Types.ObjectId, required: true, ref: 'User' },
-  username: { type: String, required: true },
-});
 
 @Schema({ timestamps: true })
 export class Task extends Document {
@@ -20,8 +14,8 @@ export class Task extends Document {
   @Prop({ required: true })
   description: string;
 
-  @Prop({ required: true, type: AuthorSchema })
-  author: IAuthor;
+  @Prop({ required: true, ref: 'User' })
+  author: Types.ObjectId;
 
   @Prop({ required: true, min: 1, max: 5 })
   level: number;

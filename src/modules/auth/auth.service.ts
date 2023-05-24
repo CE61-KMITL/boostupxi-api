@@ -1,26 +1,29 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { IUser } from '@/common/interfaces/user.interface';
-import { User } from '../users/schemas/user.schema';
 import { LoginDto } from './dtos/login.dto';
 import * as Bcrypt from 'bcryptjs';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectModel(User.name) private readonly userModel: Model<IUser>,
+    private usersService: UsersService,
     private jwtService: JwtService,
   ) {}
 
-  generateToken({ userId, role }: { userId: string; role: string }): string {
+  private generateToken({
+    userId,
+    role,
+  }: {
+    userId: string;
+    role: string;
+  }): string {
     const payload = { sub: userId, role };
     return this.jwtService.sign(payload);
   }
 
-  async login(loginDto: LoginDto) {
-    const user = await this.userModel.findOne({ email: loginDto.email });
+  async login(loginDto: LoginDto): Promise<string> {
+    const user = await this.usersService.findOneByEmail(loginDto.email);
 
     if (!user) {
       throw new HttpException('USER_NOT_FOUND', HttpStatus.NOT_FOUND);
