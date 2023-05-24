@@ -3,7 +3,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User } from '../users/schemas/user.schema';
 import { Model } from 'mongoose';
 import { IUser } from '@/common/interfaces/user.interface';
-import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class LeaderboardService {
