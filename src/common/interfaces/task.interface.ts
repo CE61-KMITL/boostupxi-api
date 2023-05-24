@@ -3,7 +3,7 @@ import { IFile } from './file.interface';
 import { ITestCase } from './testcase.interface';
 import { IComment } from './comment.interface';
 
-export type StatusType = 'queue' | 'approve' | 'reject';
+export type StatusType = 'queued' | 'approved' | 'rejected';
 
 export interface ITask extends Document {
   title: string;
