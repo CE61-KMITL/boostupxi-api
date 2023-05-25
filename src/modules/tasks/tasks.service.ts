@@ -135,6 +135,24 @@ export class TasksService {
   ) {
     const task = await this.findById(id);
 
+    if (
+      task.status === 'approved' &&
+      updateAuditTaskDto.status === 'approved'
+    ) {
+      throw new HttpException('TASK_IS_APPROVED', HttpStatus.BAD_REQUEST);
+    }
+
+    if (
+      task.status === 'rejected' &&
+      updateAuditTaskDto.status === 'rejected'
+    ) {
+      throw new HttpException('TASK_IS_REJECTED', HttpStatus.BAD_REQUEST);
+    }
+
+    if (!task.draft) {
+      throw new HttpException('TASK_IS_PUBLISHED', HttpStatus.BAD_REQUEST);
+    }
+
     if (!task) {
       throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
     }

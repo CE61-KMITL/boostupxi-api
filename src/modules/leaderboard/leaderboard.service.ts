@@ -9,11 +9,40 @@ export class LeaderboardService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<IUser>,
   ) {}
-  getLeaderboard() {
-    return 'This action returns all leaderboard';
+
+  async getLeaderboard(page = 1, limit = 20) {
+    const count = await this.userModel.countDocuments({ role: 'user' });
+
+    const leaderboardResult = await this.userModel
+      .find({ role: 'user' })
+      .select('-password -_id -email -role -createdAt -updatedAt -__v')
+      .sort({ score: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    const pages = Math.ceil(count / limit);
+
+    return {
+      currentPage: page,
+      pages,
+      data: leaderboardResult,
+    };
   }
 
-  getLeaderboardByGroup() {
-    return 'This action returns leaderboard by group';
+  async getLeaderboardByGroup() {
+    return await this.userModel.aggregate([
+      {
+        $match: { role: 'user' },
+      },
+      {
+        $group: {
+          _id: '$group',
+          score: { $sum: '$score' },
+        },
+      },
+      {
+        $sort: { score: -1 },
+      },
+    ]);
   }
 }
