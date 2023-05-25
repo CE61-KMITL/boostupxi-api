@@ -135,6 +135,10 @@ export class TasksService {
   ) {
     const task = await this.findById(id);
 
+    if (!task.draft) {
+      throw new HttpException('TASK_IS_PUBLISHED', HttpStatus.BAD_REQUEST);
+    }
+
     if (!task) {
       throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
     }

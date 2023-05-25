@@ -11,10 +11,11 @@ import { ApiTags } from '@nestjs/swagger';
 import { JwtGuard } from '@/common/guards/jwt.guard';
 import { Roles } from '@/common/decorators/roles.decorator';
 import { Role } from '@/common/enums/role.enum';
+import { RolesGuard } from '@/common/guards/roles.guard';
 
 @ApiTags('Leaderboard')
-@UseGuards(JwtGuard)
-@Roles(Role.User, Role.Staff, Role.Auditor, Role.Staff)
+@Roles(Role.User, Role.Staff, Role.Auditor, Role.Staff, Role.Admin)
+@UseGuards(JwtGuard, RolesGuard)
 @Controller('leaderboard')
 export class LeaderboardController {
   constructor(private readonly leaderboardService: LeaderboardService) {}
