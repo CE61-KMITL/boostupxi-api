@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import { IFile } from '@/common/interfaces/file.interface';
 import { StatusType } from '@/common/interfaces/task.interface';
 import { ITestCase } from '@/common/interfaces/testcase.interface';
 import { TaskStatus } from '../../../common/enums/task-status.enum';
@@ -26,8 +25,8 @@ export class Task extends Document {
   @Prop({ default: '' })
   hint: string;
 
-  @Prop({ default: [] })
-  files: IFile[];
+  @Prop({ default: [], ref: 'File' })
+  files: Types.ObjectId[];
 
   @Prop({ required: true })
   testcases: ITestCase[];

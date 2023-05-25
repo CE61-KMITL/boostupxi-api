@@ -18,6 +18,8 @@ import { RolesGuard } from '@/common/guards/roles.guard';
 import { FilesService } from './files.service';
 import { ApiTags, ApiConsumes, ApiBearerAuth } from '@nestjs/swagger';
 import { DeleteFilesDto } from './dtos/delete-files.dto';
+import { GetUser } from '@/common/decorators/get-user.decorator';
+import { IUser } from '@/common/interfaces/user.interface';
 
 @ApiTags('Files')
 @ApiBearerAuth()
@@ -31,6 +33,7 @@ export class FilesController {
   @UseInterceptors(FilesInterceptor('files'))
   @ApiConsumes('multipart/form-data')
   async uploadFiles(
+    @GetUser() user: IUser,
     @UploadedFiles(
       new ParseFilePipeBuilder()
         .addFileTypeValidator({
@@ -45,14 +48,15 @@ export class FilesController {
     )
     files: Express.Multer.File[],
   ) {
-    return await this.filesService.uploadFiles(files);
+    return await this.filesService.uploadFiles(user, files);
   }
 
   @Delete()
   async deleteFiles(
+    @GetUser() user: IUser,
     @Body(new ParseArrayPipe({ items: DeleteFilesDto }))
     deleteFilesDtos: DeleteFilesDto[],
   ) {
-    return await this.filesService.deleteFiles(deleteFilesDtos);
+    return await this.filesService.deleteFiles(user, deleteFilesDtos);
   }
 }
