@@ -15,6 +15,7 @@ import { TasksModule } from '@/modules/tasks/tasks.module';
 import { AuthModule } from '@/modules/auth/auth.module';
 import { FilesModule } from '@/modules/files/files.module';
 import { LeaderboardModule } from '@/modules/leaderboard/leaderboard.module';
+import { QuestionsModule } from './questions/questions.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { LeaderboardModule } from '@/modules/leaderboard/leaderboard.module';
     TasksModule,
     FilesModule,
     LeaderboardModule,
+    QuestionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
