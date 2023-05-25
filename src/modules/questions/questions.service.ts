@@ -47,33 +47,24 @@ export class QuestionsService {
   }
 
   async getQuestionById(id: string) {
-    const task = await this.taskModel.aggregate([
-      {
-        $match: { _id: new Types.ObjectId(id), status: 'approved' },
-      },
-      {
-        $sort: { level: 1 },
-      },
-      {
-        $addFields: {
-          testcases: {
-            $filter: {
-              input: '$testcases',
-              as: 'testcase',
-              cond: { $eq: ['$$testcase.published', true] },
-            },
-          },
+    const task = await this.taskModel.findOne({ _id: id }).select({
+      testcases: {
+        $filter: {
+          input: '$testcases',
+          as: 'testcase',
+          cond: { $eq: ['$$testcase.published', true] },
         },
       },
-      {
-        $project: {
-          draft: 0,
-          status: 0,
-          solution_code: 0,
-        },
-      },
-    ]);
+      title: 1,
+      description: 1,
+      author: 1,
+      level: 1,
+      tags: 1,
+      hint: 1,
+      files: 1,
+      comments: 1,
+    });
 
-    return task[0];
+    return task;
   }
 }
