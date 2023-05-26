@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   HttpStatus,
+  Param,
   ParseArrayPipe,
   ParseFilePipeBuilder,
   Post,
@@ -55,8 +56,10 @@ export class FilesController {
   async deleteFiles(
     @GetUser() user: IUser,
     @Body(new ParseArrayPipe({ items: DeleteFilesDto }))
+    @Param('taskId')
+    taskId: string,
     deleteFilesDtos: DeleteFilesDto[],
   ) {
-    return await this.filesService.deleteFiles(user, deleteFilesDtos);
+    return await this.filesService.deleteFiles(user, deleteFilesDtos, taskId);
   }
 }
