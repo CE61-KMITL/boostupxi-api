@@ -51,8 +51,14 @@ export class FilesService {
     throw new HttpException(`FILE_UPLOAD_FAILED`, HttpStatus.BAD_REQUEST);
   }
 
-  async deleteFiles(user: IUser, deleteFilesDtos: DeleteFilesDto[]) {
+  async deleteFiles(
+    user: IUser,
+    deleteFilesDtos: DeleteFilesDto[],
+    taskId?: string,
+  ) {
     const fileKeys = deleteFilesDtos.map((file) => file.key);
+
+    const task = await this.taskModel.findById(taskId);
 
     const files = await this.fileModel.find({
       owner: user._id,
@@ -64,8 +70,9 @@ export class FilesService {
     );
 
     if (
-      (files.length !== deleteFilesDtos.length || !isOwner) &&
-      user.role !== 'admin'
+      ((files.length !== deleteFilesDtos.length || !isOwner) &&
+        user.role !== 'admin') ||
+      (task && task.author.toString() === user._id.toString())
     ) {
       throw new HttpException(
         'USER_DOES_NOT_HAVE_PERMISSION',
@@ -75,7 +82,11 @@ export class FilesService {
 
     let deleteFilesQuery;
 
-    if (user.role === 'admin') {
+    if (user.role === 'admin' && !task) {
+      deleteFilesQuery = {
+        key: { $in: fileKeys },
+      };
+    } else if (task && task.author.toString() === user._id.toString()) {
       deleteFilesQuery = {
         key: { $in: fileKeys },
       };
