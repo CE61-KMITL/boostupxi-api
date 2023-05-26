@@ -220,7 +220,7 @@ export class TasksService {
     );
 
     await this.taskModel.findByIdAndDelete(id);
-    await this.filesService.deleteFiles(user, fileKeys);
+    await this.filesService.deleteFiles(user, fileKeys, '');
 
     throw new HttpException('TASK_DELETED', HttpStatus.OK);
   }

@@ -56,9 +56,9 @@ export class FilesController {
   async deleteFiles(
     @GetUser() user: IUser,
     @Body(new ParseArrayPipe({ items: DeleteFilesDto }))
-    @Param('taskId')
-    taskId: string,
     deleteFilesDtos: DeleteFilesDto[],
+    @Param('taskId')
+    taskId = '',
   ) {
     return await this.filesService.deleteFiles(user, deleteFilesDtos, taskId);
   }
