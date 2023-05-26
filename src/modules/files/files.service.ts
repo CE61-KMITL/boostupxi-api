@@ -1,13 +1,13 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { AwsService } from '../aws/aws.service';
-import { DeleteFilesDto } from './dtos/delete-files.dto';
-import { InjectModel } from '@nestjs/mongoose';
 import { IFile } from '@/common/interfaces/file.interface';
-import { Model } from 'mongoose';
-import { IUser } from '@/common/interfaces/user.interface';
-import { File } from './schemas/file.schema';
-import { Task } from '../tasks/schemas/task.schema';
 import { ITask } from '@/common/interfaces/task.interface';
+import { IUser } from '@/common/interfaces/user.interface';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { AwsService } from '../aws/aws.service';
+import { Task } from '../tasks/schemas/task.schema';
+import { DeleteFilesDto } from './dtos/delete-files.dto';
+import { File } from './schemas/file.schema';
 
 @Injectable()
 export class FilesService {
@@ -15,7 +15,7 @@ export class FilesService {
     @InjectModel(File.name) private readonly fileModel: Model<IFile>,
     @InjectModel(Task.name) private readonly taskModel: Model<ITask>,
     private awsService: AwsService,
-  ) {}
+  ) { }
 
   async findById(id: string): Promise<IFile> {
     return await this.fileModel.findById(id);
@@ -51,18 +51,8 @@ export class FilesService {
     throw new HttpException(`FILE_UPLOAD_FAILED`, HttpStatus.BAD_REQUEST);
   }
 
-  async deleteFiles(
-    user: IUser,
-    deleteFilesDtos: DeleteFilesDto[],
-    taskId?: string,
-  ) {
+  async deleteFiles(user: IUser, deleteFilesDtos: DeleteFilesDto[]) {
     const fileKeys = deleteFilesDtos.map((file) => file.key);
-
-    let task = null;
-
-    if (taskId) {
-      task = await this.taskModel.findById(taskId);
-    }
 
     const files = await this.fileModel.find({
       owner: user._id,
@@ -75,9 +65,7 @@ export class FilesService {
 
     if (
       (files.length !== deleteFilesDtos.length || !isOwner) &&
-      user.role !== 'admin' &&
-      taskId &&
-      task.author.toString() !== user._id.toString()
+      user.role !== 'admin'
     ) {
       throw new HttpException(
         'USER_DOES_NOT_HAVE_PERMISSION',
@@ -88,10 +76,6 @@ export class FilesService {
     let deleteFilesQuery;
 
     if (user.role === 'admin') {
-      deleteFilesQuery = {
-        key: { $in: fileKeys },
-      };
-    } else if (taskId && task.author.toString() === user._id.toString()) {
       deleteFilesQuery = {
         key: { $in: fileKeys },
       };

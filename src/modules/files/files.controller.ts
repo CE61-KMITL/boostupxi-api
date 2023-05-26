@@ -1,9 +1,14 @@
+import { GetUser } from '@/common/decorators/get-user.decorator';
+import { Roles } from '@/common/decorators/roles.decorator';
+import { Role } from '@/common/enums/role.enum';
+import { JwtGuard } from '@/common/guards/jwt.guard';
+import { RolesGuard } from '@/common/guards/roles.guard';
+import { IUser } from '@/common/interfaces/user.interface';
 import {
   Body,
   Controller,
   Delete,
   HttpStatus,
-  Param,
   ParseArrayPipe,
   ParseFilePipeBuilder,
   Post,
@@ -12,15 +17,9 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { Roles } from '@/common/decorators/roles.decorator';
-import { Role } from '@/common/enums/role.enum';
-import { JwtGuard } from '@/common/guards/jwt.guard';
-import { RolesGuard } from '@/common/guards/roles.guard';
-import { FilesService } from './files.service';
-import { ApiTags, ApiConsumes, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { DeleteFilesDto } from './dtos/delete-files.dto';
-import { GetUser } from '@/common/decorators/get-user.decorator';
-import { IUser } from '@/common/interfaces/user.interface';
+import { FilesService } from './files.service';
 
 @ApiTags('Files')
 @ApiBearerAuth()
@@ -28,7 +27,7 @@ import { IUser } from '@/common/interfaces/user.interface';
 @Roles(Role.Auditor, Role.Staff, Role.Admin)
 @UseGuards(JwtGuard, RolesGuard)
 export class FilesController {
-  constructor(private readonly filesService: FilesService) {}
+  constructor(private readonly filesService: FilesService) { }
 
   @Post()
   @UseInterceptors(FilesInterceptor('files'))
@@ -57,9 +56,7 @@ export class FilesController {
     @GetUser() user: IUser,
     @Body(new ParseArrayPipe({ items: DeleteFilesDto }))
     deleteFilesDtos: DeleteFilesDto[],
-    @Param('taskId')
-    taskId = '',
   ) {
-    return await this.filesService.deleteFiles(user, deleteFilesDtos, taskId);
+    return await this.filesService.deleteFiles(user, deleteFilesDtos);
   }
 }

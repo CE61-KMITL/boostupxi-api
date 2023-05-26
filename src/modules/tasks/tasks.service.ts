@@ -1,25 +1,25 @@
+import { IFile } from '@/common/interfaces/file.interface';
+import { ITask } from '@/common/interfaces/task.interface';
+import { IUser } from '@/common/interfaces/user.interface';
 import {
   HttpException,
   HttpStatus,
-  Injectable,
   Inject,
+  Injectable,
   forwardRef,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Task } from './schemas/task.schema';
-import { ITask } from '@/common/interfaces/task.interface';
-import { CreateTaskDto } from './dtos/create-task.dto';
-import { IUser } from '@/common/interfaces/user.interface';
-import { UpdateTaskDto } from './dtos/update-task.dto';
-import { UpdateAuditTaskDto } from './dtos/update-audit-task.dto';
-import { CreateCommentDto } from './dtos/create-comment.dto';
-import { UpdateCommentDto } from './dtos/update-comment.dto';
 import { v4 as uuidv4 } from 'uuid';
-import { UpdateDraftTaskDto } from './dtos/update-draft-task.dto';
-import { UsersService } from '../users/users.service';
 import { FilesService } from '../files/files.service';
-import { IFile } from '@/common/interfaces/file.interface';
+import { UsersService } from '../users/users.service';
+import { CreateCommentDto } from './dtos/create-comment.dto';
+import { CreateTaskDto } from './dtos/create-task.dto';
+import { UpdateAuditTaskDto } from './dtos/update-audit-task.dto';
+import { UpdateCommentDto } from './dtos/update-comment.dto';
+import { UpdateDraftTaskDto } from './dtos/update-draft-task.dto';
+import { UpdateTaskDto } from './dtos/update-task.dto';
+import { Task } from './schemas/task.schema';
 
 @Injectable()
 export class TasksService {
@@ -27,7 +27,7 @@ export class TasksService {
     @InjectModel(Task.name) private readonly taskModel: Model<ITask>,
     @Inject(forwardRef(() => UsersService)) private usersService: UsersService,
     private filesService: FilesService,
-  ) {}
+  ) { }
 
   async findByAuthor(author: string): Promise<ITask[]> {
     return this.taskModel.find({ author });
@@ -220,7 +220,7 @@ export class TasksService {
     );
 
     await this.taskModel.findByIdAndDelete(id);
-    await this.filesService.deleteFiles(user, fileKeys, '');
+    await this.filesService.deleteFiles(user, fileKeys);
 
     throw new HttpException('TASK_DELETED', HttpStatus.OK);
   }
