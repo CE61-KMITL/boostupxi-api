@@ -7,9 +7,9 @@ import {
   IsNotEmpty,
   IsOptional,
 } from 'class-validator';
-import { IFile } from '@/common/interfaces/file.interface';
 import { ITestCase } from '@/common/interfaces/testcase.interface';
 import { ApiProperty } from '@nestjs/swagger';
+import { Types } from 'mongoose';
 
 export class CreateTaskDto {
   @ApiProperty({
@@ -77,15 +77,10 @@ export class CreateTaskDto {
   solution_code: string;
 
   @ApiProperty({
-    example: [
-      {
-        key: 'key',
-        url: 'url',
-      },
-    ],
+    example: ['id1', 'id2'],
     description: 'Files of the task',
   })
   @IsArray()
   @IsOptional()
-  files: IFile[];
+  files: Types.ObjectId[];
 }
