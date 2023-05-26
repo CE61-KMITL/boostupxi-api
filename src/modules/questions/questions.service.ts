@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Task } from '../tasks/schemas/task.schema';
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import { ITask } from '@/common/interfaces/task.interface';
 
 @Injectable()

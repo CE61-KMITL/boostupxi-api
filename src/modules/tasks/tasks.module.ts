@@ -3,18 +3,20 @@ import { TasksService } from './tasks.service';
 import { TasksController } from './tasks.controller';
 import { Task, TaskSchema } from './schemas/task.schema';
 import { MongooseModule } from '@nestjs/mongoose';
-import { AwsModule } from '../aws/aws.module';
 import { User, UserSchema } from '../users/schemas/user.schema';
 import { UsersModule } from '../users/users.module';
+import { FilesModule } from '../files/files.module';
+import { File, FileSchema } from '../files/schemas/file.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: Task.name, schema: TaskSchema },
       { name: User.name, schema: UserSchema },
+      { name: File.name, schema: FileSchema },
     ]),
-    AwsModule,
     forwardRef(() => UsersModule),
+    FilesModule,
   ],
   controllers: [TasksController],
   providers: [TasksService],

@@ -5,9 +5,18 @@ import {
   Param,
   ParseIntPipe,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { QuestionsService } from './questions.service';
+import { ApiTags } from '@nestjs/swagger';
+import { JwtGuard } from '@/common/guards/jwt.guard';
+import { Role } from '@/common/enums/role.enum';
+import { RolesGuard } from '@/common/guards/roles.guard';
+import { Roles } from '@/common/decorators/roles.decorator';
 
+@ApiTags('Questions')
+@Roles(Role.User, Role.Staff, Role.Auditor, Role.Staff, Role.Admin)
+@UseGuards(JwtGuard, RolesGuard)
 @Controller('questions')
 export class QuestionsController {
   constructor(private questionsService: QuestionsService) {}

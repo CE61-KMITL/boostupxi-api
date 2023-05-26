@@ -11,7 +11,6 @@ import { Task } from './schemas/task.schema';
 import { ITask } from '@/common/interfaces/task.interface';
 import { CreateTaskDto } from './dtos/create-task.dto';
 import { IUser } from '@/common/interfaces/user.interface';
-import { AwsService } from '../aws/aws.service';
 import { UpdateTaskDto } from './dtos/update-task.dto';
 import { UpdateAuditTaskDto } from './dtos/update-audit-task.dto';
 import { CreateCommentDto } from './dtos/create-comment.dto';
@@ -19,13 +18,15 @@ import { UpdateCommentDto } from './dtos/update-comment.dto';
 import { v4 as uuidv4 } from 'uuid';
 import { UpdateDraftTaskDto } from './dtos/update-draft-task.dto';
 import { UsersService } from '../users/users.service';
+import { FilesService } from '../files/files.service';
+import { IFile } from '@/common/interfaces/file.interface';
 
 @Injectable()
 export class TasksService {
   constructor(
     @InjectModel(Task.name) private readonly taskModel: Model<ITask>,
     @Inject(forwardRef(() => UsersService)) private usersService: UsersService,
-    private awsService: AwsService,
+    private filesService: FilesService,
   ) {}
 
   async findByAuthor(author: string): Promise<ITask[]> {
@@ -62,6 +63,15 @@ export class TasksService {
     );
 
     task.comments = comments;
+
+    const fileKeys = await Promise.all(
+      task.files.map(async (fileId) => {
+        const file = await this.filesService.findById(fileId.toString());
+        return { id: file._id, key: file.key, url: file.url } as IFile;
+      }),
+    );
+
+    task.files = fileKeys;
 
     return task;
   }
@@ -135,6 +145,24 @@ export class TasksService {
   ) {
     const task = await this.findById(id);
 
+    if (
+      task.status === 'approved' &&
+      updateAuditTaskDto.status === 'approved'
+    ) {
+      throw new HttpException('TASK_IS_APPROVED', HttpStatus.BAD_REQUEST);
+    }
+
+    if (
+      task.status === 'rejected' &&
+      updateAuditTaskDto.status === 'rejected'
+    ) {
+      throw new HttpException('TASK_IS_REJECTED', HttpStatus.BAD_REQUEST);
+    }
+
+    if (!task.draft) {
+      throw new HttpException('TASK_IS_PUBLISHED', HttpStatus.BAD_REQUEST);
+    }
+
     if (!task) {
       throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
     }
@@ -184,9 +212,16 @@ export class TasksService {
       throw new HttpException('UNAUTHORIZED', HttpStatus.UNAUTHORIZED);
     }
 
-    const keys = task.files.map((file) => ({ key: file.key }));
-    await this.awsService.deleteFiles(keys);
+    const fileKeys = await Promise.all(
+      task.files.map(async (fileId) => {
+        const file = await this.filesService.findById(fileId.toString());
+        return { key: file.key };
+      }),
+    );
+
     await this.taskModel.findByIdAndDelete(id);
+    await this.filesService.deleteFiles(user, fileKeys);
+
     throw new HttpException('TASK_DELETED', HttpStatus.OK);
   }
 

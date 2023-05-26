@@ -3,7 +3,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User } from '../users/schemas/user.schema';
 import { Model } from 'mongoose';
 import { IUser } from '@/common/interfaces/user.interface';
-import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class LeaderboardService {
@@ -12,39 +11,26 @@ export class LeaderboardService {
   ) {}
 
   async getLeaderboard(page = 1, limit = 20) {
-    const users = await this.userModel.aggregate([
-      {
-        $match: { role: 'user' },
-      },
-      {
-        $sort: { score: -1 },
-      },
-      {
-        $project: {
-          password: 0,
-          role: 0,
-        },
-      },
-      {
-        $skip: (page - 1) * limit,
-      },
-      {
-        $limit: limit,
-      },
-    ]);
+    const count = await this.userModel.countDocuments({ role: 'user' });
 
-    const count = await this.userModel.find({ role: 'user' }).countDocuments();
+    const leaderboardResult = await this.userModel
+      .find({ role: 'user' })
+      .select('-password -_id -email -role -createdAt -updatedAt -__v')
+      .sort({ score: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+
     const pages = Math.ceil(count / limit);
 
     return {
       currentPage: page,
       pages,
-      data: await Promise.all(users),
+      data: leaderboardResult,
     };
   }
 
   async getLeaderboardByGroup() {
-    const userGroups = await this.userModel.aggregate([
+    return await this.userModel.aggregate([
       {
         $match: { role: 'user' },
       },
@@ -58,7 +44,5 @@ export class LeaderboardService {
         $sort: { score: -1 },
       },
     ]);
-
-    return userGroups;
   }
 }
