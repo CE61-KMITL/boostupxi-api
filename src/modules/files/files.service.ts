@@ -58,7 +58,11 @@ export class FilesService {
   ) {
     const fileKeys = deleteFilesDtos.map((file) => file.key);
 
-    const task = await this.taskModel.findById(taskId);
+    let task = null;
+
+    if (taskId) {
+      task = await this.taskModel.findById(taskId);
+    }
 
     const files = await this.fileModel.find({
       owner: user._id,
@@ -70,9 +74,10 @@ export class FilesService {
     );
 
     if (
-      ((files.length !== deleteFilesDtos.length || !isOwner) &&
-        user.role !== 'admin') ||
-      (task && task.author.toString() === user._id.toString())
+      (files.length !== deleteFilesDtos.length || !isOwner) &&
+      user.role !== 'admin' &&
+      taskId &&
+      task.author.toString() !== user._id.toString()
     ) {
       throw new HttpException(
         'USER_DOES_NOT_HAVE_PERMISSION',
@@ -82,11 +87,11 @@ export class FilesService {
 
     let deleteFilesQuery;
 
-    if (user.role === 'admin' && !task) {
+    if (user.role === 'admin') {
       deleteFilesQuery = {
         key: { $in: fileKeys },
       };
-    } else if (task && task.author.toString() === user._id.toString()) {
+    } else if (taskId && task.author.toString() === user._id.toString()) {
       deleteFilesQuery = {
         key: { $in: fileKeys },
       };
