@@ -1,11 +1,9 @@
 import { IFile } from '@/common/interfaces/file.interface';
-import { ITask } from '@/common/interfaces/task.interface';
 import { IUser } from '@/common/interfaces/user.interface';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { AwsService } from '../aws/aws.service';
-import { Task } from '../tasks/schemas/task.schema';
 import { DeleteFilesDto } from './dtos/delete-files.dto';
 import { File } from './schemas/file.schema';
 
@@ -13,9 +11,8 @@ import { File } from './schemas/file.schema';
 export class FilesService {
   constructor(
     @InjectModel(File.name) private readonly fileModel: Model<IFile>,
-    @InjectModel(Task.name) private readonly taskModel: Model<ITask>,
     private awsService: AwsService,
-  ) { }
+  ) {}
 
   async findById(id: string): Promise<IFile> {
     return await this.fileModel.findById(id);

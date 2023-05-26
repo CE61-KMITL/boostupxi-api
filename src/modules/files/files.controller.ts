@@ -27,7 +27,7 @@ import { FilesService } from './files.service';
 @Roles(Role.Auditor, Role.Staff, Role.Admin)
 @UseGuards(JwtGuard, RolesGuard)
 export class FilesController {
-  constructor(private readonly filesService: FilesService) { }
+  constructor(private readonly filesService: FilesService) {}
 
   @Post()
   @UseInterceptors(FilesInterceptor('files'))
