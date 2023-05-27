@@ -3,74 +3,83 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Task } from '../tasks/schemas/task.schema';
 import { Model } from 'mongoose';
 import { ITask } from '@/common/interfaces/task.interface';
+import { UsersService } from '../users/users.service';
+import { FilesService } from '../files/files.service';
+import { IFile } from '@/common/interfaces/file.interface';
 
 @Injectable()
 export class QuestionsService {
   constructor(
     @InjectModel(Task.name) private readonly taskModel: Model<ITask>,
+    private usersService: UsersService,
+    private filesService: FilesService,
   ) {}
 
-  async getQuestions(page = 1, limit = 9) {
-    const tasks = await this.taskModel.aggregate([
-      {
-        $match: { status: 'approved' },
-      },
-      {
-        $sort: { level: 1 },
-      },
-      {
-        $skip: (page - 1) * limit,
-      },
-      {
-        $limit: limit,
-      },
-      {
-        $project: {
-          title: 1,
-          author: 1,
-          level: 1,
-          tags: 1,
-        },
-      },
-    ]);
+  private async formattedQuestionData(question: ITask) {
+    const user = await this.usersService.findById(question.author.toString());
+
+    question.author = {
+      username: user.username,
+    };
+
+    const fileKeys = await Promise.all(
+      question.files.map(async (fileId) => {
+        const file = await this.filesService.findById(fileId.toString());
+        return { id: file._id, key: file.key, url: file.url } as IFile;
+      }),
+    );
+
+    question.files = fileKeys;
+
+    question.testcases = question.testcases.filter(
+      (testcase) => testcase.published,
+    );
+
+    return question;
+  }
+
+  async getQuestions(page = 1, limit = 10) {
+    const questions = await this.taskModel
+      .find({ status: 'approved', draft: false })
+      .select('-status -draft -solution_code -comments -hint')
+      .skip(limit * (page - 1))
+      .limit(limit);
 
     const count = await this.taskModel
-      .find({ status: 'approved' })
+      .find({ status: 'approved', draft: false })
       .countDocuments();
+
     const pages = Math.ceil(count / limit);
+
+    const formattedQuestion = questions.map((question) =>
+      this.formattedQuestionData(question),
+    );
 
     return {
       currentPage: page,
       pages,
-      data: await Promise.all(tasks),
+      data: await Promise.all(formattedQuestion),
     };
   }
 
   async getQuestionById(id: string) {
-    const check_task_status = await this.taskModel.findById(id);
+    const question = await this.taskModel.findById(id);
 
-    if (check_task_status.status != 'approved') {
-      throw new HttpException('TASK_NOT_APPROVED', HttpStatus.FORBIDDEN);
+    if (!question) {
+      throw new HttpException('QUESTION_NOT_FOUND', HttpStatus.NOT_FOUND);
     }
 
-    const task = await this.taskModel.findOne({ _id: id }).select({
-      testcases: {
-        $filter: {
-          input: '$testcases',
-          as: 'testcase',
-          cond: { $eq: ['$$testcase.published', true] },
-        },
-      },
-      title: 1,
-      description: 1,
-      author: 1,
-      level: 1,
-      tags: 1,
-      hint: 1,
-      files: 1,
-      comments: 1,
-    });
+    if (question.status !== 'approved' || question.draft) {
+      throw new HttpException(
+        "YOU_CAN'T_GET_THIS_QUESTION",
+        HttpStatus.FORBIDDEN,
+      );
+    }
 
-    return task;
+    const selectQuestion = await this.taskModel
+      .findById(id)
+      .select('-status -draft -solution_code -comments -hint');
+
+    return this.formattedQuestionData(selectQuestion);
   }
 }
