@@ -20,6 +20,7 @@ import { UpdateCommentDto } from './dtos/update-comment.dto';
 import { UpdateDraftTaskDto } from './dtos/update-draft-task.dto';
 import { UpdateTaskDto } from './dtos/update-task.dto';
 import { Task } from './schemas/task.schema';
+import { ITestCase } from '@/common/interfaces/testcase.interface';
 
 @Injectable()
 export class TasksService {
@@ -117,6 +118,19 @@ export class TasksService {
     }
 
     return this.formattedTaskData(task);
+  }
+
+  async getTestCasesByTaskId(id: string): Promise<ITestCase[]> {
+    const task = await this.findById(id);
+
+    if (!task) {
+      throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
+    }
+
+    return task.testcases.map((testCase) => ({
+      input: testCase.input,
+      output: testCase.output,
+    }));
   }
 
   async update(id: string, updateTaskDto: UpdateTaskDto, user: IUser) {

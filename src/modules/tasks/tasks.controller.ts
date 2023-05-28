@@ -27,6 +27,7 @@ import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { CreateCommentDto } from './dtos/create-comment.dto';
 import { UpdateCommentDto } from './dtos/update-comment.dto';
 import { UpdateDraftTaskDto } from './dtos/update-draft-task.dto';
+import { ITestCase } from '@/common/interfaces/testcase.interface';
 
 @ApiTags('Tasks')
 @ApiBearerAuth()
@@ -72,6 +73,13 @@ export class TasksController {
   @UseGuards(JwtGuard, RolesGuard)
   async getTaskById(@Param('id') id: string): Promise<ITask> {
     return await this.tasksService.getTaskById(id);
+  }
+
+  @Get('/:id/testcases')
+  @Roles(Role.User)
+  @UseGuards(JwtGuard, RolesGuard)
+  async getTestCasesByTaskId(@Param('id') id: string): Promise<ITestCase[]> {
+    return await this.tasksService.getTestCasesByTaskId(id);
   }
 
   @Patch('/:id')
