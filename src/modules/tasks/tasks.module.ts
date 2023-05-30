@@ -7,7 +7,6 @@ import { User, UserSchema } from '../users/schemas/user.schema';
 import { UsersModule } from '../users/users.module';
 import { FilesModule } from '../files/files.module';
 import { File, FileSchema } from '../files/schemas/file.schema';
-import { DiscordModule } from '../discord/discord.module';
 
 @Module({
   imports: [
@@ -18,7 +17,6 @@ import { DiscordModule } from '../discord/discord.module';
     ]),
     forwardRef(() => UsersModule),
     FilesModule,
-    DiscordModule
   ],
   controllers: [TasksController],
   providers: [TasksService],
