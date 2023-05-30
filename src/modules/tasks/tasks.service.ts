@@ -20,6 +20,7 @@ import { UpdateCommentDto } from './dtos/update-comment.dto';
 import { UpdateDraftTaskDto } from './dtos/update-draft-task.dto';
 import { UpdateTaskDto } from './dtos/update-task.dto';
 import { Task } from './schemas/task.schema';
+import { DiscordService } from '../discord/discord.service';
 
 @Injectable()
 export class TasksService {
@@ -27,6 +28,7 @@ export class TasksService {
     @InjectModel(Task.name) private readonly taskModel: Model<ITask>,
     @Inject(forwardRef(() => UsersService)) private usersService: UsersService,
     private filesService: FilesService,
+    private discordService: DiscordService,
   ) {}
 
   async findByAuthor(author: string): Promise<ITask[]> {
@@ -195,6 +197,25 @@ export class TasksService {
       new: true,
     });
 
+    if(!updateDraftTaskDto.draft){
+      const embed = {
+        title: `โจทย์ ${task.title}`,
+        description: 'มีโจทย์ใหม่ลงให้น้องๆทำแล้วนะ',
+        color: 16711680,
+        footer: {text: 'CEBUXI'},
+      }
+      this.discordService.sendEmbed(embed)
+    }
+    else if(updateDraftTaskDto.draft){
+      const embed = {
+        title: `โจทย์ ${task.title}`,
+        description: 'พี่ขอปิดโจทย์แปปนึง',
+        color: 0xfed9b7,
+        footer: {text: 'CEBUXI'}
+      }
+      this.discordService.sendEmbed(embed)
+    }
+
     throw new HttpException('TASK_DRAFTED', HttpStatus.OK);
   }
 
@@ -324,5 +345,19 @@ export class TasksService {
     );
 
     throw new HttpException('COMMENT_UPDATED', HttpStatus.OK);
+  }
+
+  async getHint(id: string, user: IUser){
+    const task = await this.findById(id);
+
+    if (!task) {
+      throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
+    }
+
+    if (!task.hint_user.includes(user._id)){
+      task.hint_user = [...task.hint_user, user._id]
+    }
+
+    await this.taskModel.findByIdAndUpdate(id, task, {new: true})
   }
 }
