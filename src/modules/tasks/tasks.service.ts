@@ -27,7 +27,7 @@ export class TasksService {
     @InjectModel(Task.name) private readonly taskModel: Model<ITask>,
     @Inject(forwardRef(() => UsersService)) private usersService: UsersService,
     private filesService: FilesService,
-  ) { }
+  ) {}
 
   async findByAuthor(author: string): Promise<ITask[]> {
     return this.taskModel.find({ author });
