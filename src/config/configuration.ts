@@ -12,8 +12,4 @@ export default () => ({
     bucket: process.env.AWS_BUCKET,
     region: process.env.AWS_REGION,
   },
-  discord: {
-    url: process.env.DISCORD_WEBHOOK_URL,
-    name: process.env.DISCORD_WEBHOOK_USERNAME,
-  }
 });
