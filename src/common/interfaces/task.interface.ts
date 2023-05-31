@@ -22,4 +22,5 @@ export interface ITask extends Document {
   status: StatusType;
   solution_code: string;
   comments: IComment[];
+  hint_user: Types.ObjectId[];
 }

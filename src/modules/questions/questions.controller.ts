@@ -13,6 +13,8 @@ import { JwtGuard } from '@/common/guards/jwt.guard';
 import { Role } from '@/common/enums/role.enum';
 import { RolesGuard } from '@/common/guards/roles.guard';
 import { Roles } from '@/common/decorators/roles.decorator';
+import { GetUser } from '@/common/decorators/get-user.decorator';
+import { IUser } from '@/common/interfaces/user.interface';
 
 @ApiTags('Questions')
 @Roles(Role.User, Role.Staff, Role.Auditor, Role.Staff, Role.Admin)
@@ -42,7 +44,12 @@ export class QuestionsController {
   }
 
   @Get('/:id')
-  async getQuestionById(@Param('id') id: string) {
-    return this.questionsService.getQuestionById(id);
+  async getQuestionById(@Param('id') id: string, @GetUser() user: IUser) {
+    return this.questionsService.getQuestionById(id, user);
+  }
+
+  @Get('/:id/hint')
+  async getHintById(@Param('id') id: string, @GetUser() user: IUser) {
+    return this.questionsService.getHintById(id, user);
   }
 }

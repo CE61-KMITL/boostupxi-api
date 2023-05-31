@@ -7,6 +7,7 @@ import { User, UserSchema } from '../users/schemas/user.schema';
 import { File, FileSchema } from '../files/schemas/file.schema';
 import { FilesModule } from '../files/files.module';
 import { UsersModule } from '../users/users.module';
+import { TasksModule } from '../tasks/tasks.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { UsersModule } from '../users/users.module';
     ]),
     FilesModule,
     UsersModule,
+    TasksModule,
   ],
   controllers: [QuestionsController],
   providers: [QuestionsService],
