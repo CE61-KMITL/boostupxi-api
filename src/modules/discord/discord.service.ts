@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { WebhookClient, EmbedBuilder, Embed, EmbedData } from 'discord.js';
+import { WebhookClient, EmbedBuilder, EmbedData } from 'discord.js';
 
 @Injectable()
 export class DiscordService {
@@ -12,15 +12,10 @@ export class DiscordService {
     });
   }
 
-  async sendMessage(message: string): Promise<void> {
-    await this.webhookClient.send(message);
-  }
-
   async sendEmbed(embedData: EmbedData): Promise<void> {
-    const embed = new EmbedBuilder(embedData);
     await this.webhookClient.send({
-      username: 'Test',
-      embeds: [embed],
+      username: this.configService.get<string>('discord.username'),
+      embeds: [new EmbedBuilder(embedData)],
     });
   }
 }
