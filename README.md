@@ -20,20 +20,11 @@ npm install
 - Run with NodeJS
 
 ```bash
-npm run dev
+npm run start:dev
 ```
 
 - Run with Docker
 
 ```bash
 docker-compose up -d
-```
-
-## Deploy
-
-- Run with Docker
-
-```bash
-docker build -t ceboostup-xi .
-docker run -d --env-file=.env --name ceboostup-xi -p 5050:5050 ceboostup-xi
 ```
