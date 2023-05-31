@@ -4,6 +4,7 @@ import {
   HttpStatus,
   Param,
   ParseIntPipe,
+  Post,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -39,17 +40,18 @@ export class QuestionsController {
       }),
     )
     limit: number,
+    @GetUser() user: IUser,
   ) {
-    return this.questionsService.getQuestions(page, limit);
+    return this.questionsService.getQuestions(page, limit, user._id);
   }
 
   @Get('/:id')
   async getQuestionById(@Param('id') id: string, @GetUser() user: IUser) {
-    return this.questionsService.getQuestionById(id, user);
+    return this.questionsService.getQuestionById(id, user._id);
   }
 
-  @Get('/:id/hint')
-  async getHintById(@Param('id') id: string, @GetUser() user: IUser) {
-    return this.questionsService.getHintById(id, user);
+  @Post('/:id/hint')
+  async buyHint(@Param('id') id: string, @GetUser() user: IUser) {
+    return this.questionsService.buyHint(id, user._id);
   }
 }

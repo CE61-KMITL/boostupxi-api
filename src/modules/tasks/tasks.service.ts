@@ -96,6 +96,7 @@ export class TasksService {
   async getTasks(page = 1, limit = 25) {
     const tasks = await this.taskModel
       .find()
+      .select('-purchased_hint -passedBy')
       .skip((page - 1) * limit)
       .limit(limit)
       .exec();
@@ -113,7 +114,9 @@ export class TasksService {
   }
 
   async getTaskById(id: string): Promise<ITask> {
-    const task = await this.findById(id);
+    const task = await this.taskModel
+      .findById(id)
+      .select('-purchased_hint -passedBy');
 
     if (!task) {
       throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
@@ -213,11 +216,15 @@ export class TasksService {
       throw new HttpException('TASK_IS_PUBLISHED', HttpStatus.BAD_REQUEST);
     }
 
-    await this.taskModel.findByIdAndUpdate(id, updateDraftTaskDto, {
-      new: true,
-    });
+    const updatedTask = await this.taskModel.findByIdAndUpdate(
+      id,
+      updateDraftTaskDto,
+      {
+        new: true,
+      },
+    );
 
-    if (!updateDraftTaskDto.draft) {
+    if (!updatedTask.draft) {
       const embed = {
         title: `โจทย์ ${task.title} ถูกเพิ่มเข้าระบบแล้ว! 🎉`,
         description:
@@ -397,19 +404,5 @@ export class TasksService {
     );
 
     throw new HttpException('COMMENT_UPDATED', HttpStatus.OK);
-  }
-
-  async getHint(id: string, user: IUser) {
-    const task = await this.findById(id);
-
-    if (!task) {
-      throw new HttpException('TASK_NOT_FOUND', HttpStatus.NOT_FOUND);
-    }
-
-    if (!task.hint_user.includes(user._id)) {
-      task.hint_user = [...task.hint_user, user._id];
-    }
-
-    await this.taskModel.findByIdAndUpdate(id, task, { new: true });
   }
 }

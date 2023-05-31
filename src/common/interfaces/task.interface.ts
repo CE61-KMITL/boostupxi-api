@@ -22,5 +22,8 @@ export interface ITask extends Document {
   status: StatusType;
   solution_code: string;
   comments: IComment[];
-  hint_user: Types.ObjectId[];
+  purchased_hint: Types.ObjectId[];
+  passedBy: Types.ObjectId[];
+  createdAt: Date;
+  updatedAt: Date;
 }
