@@ -14,6 +14,6 @@ export default () => ({
   },
   discord: {
     url: process.env.DISCORD_WEBHOOK_URL,
-    name: process.env.DISCORD_WEBHOOK_USERNAME,
+    username: process.env.DISCORD_WEBHOOK_USERNAME,
   },
 });
