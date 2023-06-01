@@ -248,7 +248,10 @@ export class TasksService {
         fields: [
           {
             name: 'Description',
-            value: `${task.description.substring(0, 100)}...`,
+            value:
+              task.description.length > 100
+                ? `${task.description.substring(0, 100)}...`
+                : task.description,
             inline: false,
           },
           {
