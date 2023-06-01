@@ -17,4 +17,5 @@ export interface IQuestionResponse {
   passedByUser: boolean;
   score: number;
   hintCost: number;
+  hint?: string;
 }

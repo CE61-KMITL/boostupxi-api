@@ -26,6 +26,15 @@ export class QuestionsService {
       }),
     );
 
+    const hintPurchased = question.purchased_hint.includes(
+      new Types.ObjectId(userId),
+    );
+
+    let hint: string | undefined;
+    if (hintPurchased) {
+      hint = question.hint;
+    }
+
     return {
       _id: question._id,
       title: question.title,
@@ -40,6 +49,7 @@ export class QuestionsService {
       passedByUser: question.passedBy.includes(new Types.ObjectId(userId)),
       score: question.level * 100,
       hintCost: question.level ? question.level * 40 : 0,
+      ...(hint && { hint }),
     };
   }
 
