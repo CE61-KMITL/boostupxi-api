@@ -125,10 +125,7 @@ export class QuestionsService {
 
     question.purchased_hint.push(user._id);
 
-    await this.userModel.findByIdAndUpdate(userId, { score: user.score });
-    await this.taskModel.findByIdAndUpdate(id, {
-      purchased_hint: question.purchased_hint,
-    });
+    await Promise.all([question.save(), user.save()]);
 
     throw new HttpException('BUY_HINT_SUCCESS', HttpStatus.OK);
   }

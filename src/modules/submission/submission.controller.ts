@@ -8,6 +8,7 @@ import { SubmissionService } from './submission.service';
 import { AddSubmissionDto } from './dtos/add-submission.dto';
 import { GetUser } from '@/common/decorators/get-user.decorator';
 import { IUser } from '@/common/interfaces/user.interface';
+import { ISubmission } from '@/common/interfaces/submission.interface';
 
 @ApiTags('Submission')
 @Controller('/submission')
@@ -20,7 +21,7 @@ export class SubmissionController {
   async submit(
     @Body() addSubmissionDto: AddSubmissionDto,
     @GetUser() user: IUser,
-  ) {
+  ): Promise<ISubmission> {
     return this.submissionService.submit(addSubmissionDto, user._id);
   }
 }
