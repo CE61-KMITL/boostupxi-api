@@ -17,6 +17,7 @@ import { FilesModule } from '@/modules/files/files.module';
 import { LeaderboardModule } from '@/modules/leaderboard/leaderboard.module';
 import { QuestionsModule } from './questions/questions.module';
 import { DiscordModule } from './discord/discord.module';
+import { SubmissionModule } from './submission/submission.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { DiscordModule } from './discord/discord.module';
     LeaderboardModule,
     QuestionsModule,
     DiscordModule,
+    SubmissionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
