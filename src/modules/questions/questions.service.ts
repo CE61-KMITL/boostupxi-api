@@ -47,6 +47,7 @@ export class QuestionsService {
       createdAt: question.createdAt,
       updatedAt: question.updatedAt,
       passedByUser: question.passedBy.includes(new Types.ObjectId(userId)),
+      userPassCount: question.passedBy.length,
       score: question.level * 100,
       hintCost: question.level ? question.level * 40 : 0,
       ...(hint && { hint }),
