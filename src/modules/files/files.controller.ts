@@ -8,6 +8,7 @@ import {
   Body,
   Controller,
   Delete,
+  HttpExceptionOptions,
   HttpStatus,
   ParseArrayPipe,
   ParseFilePipeBuilder,
@@ -47,7 +48,9 @@ export class FilesController {
         }),
     )
     files: Express.Multer.File[],
-  ) {
+  ): Promise<
+    HttpExceptionOptions | { id: string; url: string; key: string }[]
+  > {
     return await this.filesService.uploadFiles(user, files);
   }
 
@@ -56,7 +59,7 @@ export class FilesController {
     @GetUser() user: IUser,
     @Body(new ParseArrayPipe({ items: DeleteFilesDto }))
     deleteFilesDtos: DeleteFilesDto[],
-  ) {
+  ): Promise<HttpExceptionOptions> {
     return await this.filesService.deleteFiles(user, deleteFilesDtos);
   }
 }

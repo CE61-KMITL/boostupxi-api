@@ -17,6 +17,7 @@ import { UsersModule } from '../users/users.module';
     ]),
     FilesModule,
     UsersModule,
+
   ],
   controllers: [QuestionsController],
   providers: [QuestionsService],

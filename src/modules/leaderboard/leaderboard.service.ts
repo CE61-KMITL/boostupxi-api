@@ -3,6 +3,10 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User } from '../users/schemas/user.schema';
 import { Model } from 'mongoose';
 import { IUser } from '@/common/interfaces/user.interface';
+import {
+  IGroupLeaderboard,
+  IUserLeaderboardWithPagination,
+} from '@/common/interfaces/leaderboard.interface';
 
 @Injectable()
 export class LeaderboardService {
@@ -10,7 +14,10 @@ export class LeaderboardService {
     @InjectModel(User.name) private readonly userModel: Model<IUser>,
   ) {}
 
-  async getLeaderboard(page = 1, limit = 20) {
+  async getLeaderboard(
+    page = 1,
+    limit = 20,
+  ): Promise<IUserLeaderboardWithPagination> {
     const count = await this.userModel.countDocuments({ role: 'user' });
 
     const leaderboardResult = await this.userModel
@@ -29,8 +36,8 @@ export class LeaderboardService {
     };
   }
 
-  async getLeaderboardByGroup() {
-    return await this.userModel.aggregate([
+  async getLeaderboardByGroup(): Promise<IGroupLeaderboard[]> {
+    const scoreByGroup = await this.userModel.aggregate([
       {
         $match: { role: 'user' },
       },
@@ -44,5 +51,6 @@ export class LeaderboardService {
         $sort: { score: -1 },
       },
     ]);
+    return scoreByGroup;
   }
 }

@@ -1,6 +1,11 @@
 import { IFile } from '@/common/interfaces/file.interface';
 import { IUser } from '@/common/interfaces/user.interface';
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpExceptionOptions,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { AwsService } from '../aws/aws.service';
@@ -14,11 +19,12 @@ export class FilesService {
     private awsService: AwsService,
   ) {}
 
-  async findById(id: string): Promise<IFile> {
-    return await this.fileModel.findById(id);
-  }
-
-  async uploadFiles(user: IUser, files: Express.Multer.File[]) {
+  async uploadFiles(
+    user: IUser,
+    files: Express.Multer.File[],
+  ): Promise<
+    HttpExceptionOptions | { id: string; url: string; key: string }[]
+  > {
     const regex = /^boostup_[a-zA-Z0-9_]+\.(png|jpeg|jpg|zip)$/;
     const invalidFiles = files.filter((file) => !regex.test(file.originalname));
 
@@ -48,7 +54,10 @@ export class FilesService {
     throw new HttpException(`FILE_UPLOAD_FAILED`, HttpStatus.BAD_REQUEST);
   }
 
-  async deleteFiles(user: IUser, deleteFilesDtos: DeleteFilesDto[]) {
+  async deleteFiles(
+    user: IUser,
+    deleteFilesDtos: DeleteFilesDto[],
+  ): Promise<HttpExceptionOptions> {
     const fileKeys = deleteFilesDtos.map((file) => file.key);
 
     const files = await this.fileModel.find({
