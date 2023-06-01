@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   HttpCode,
+  HttpExceptionOptions,
   HttpStatus,
   Param,
   ParseIntPipe,
@@ -20,7 +21,10 @@ import { RolesGuard } from '@/common/guards/roles.guard';
 import { TasksService } from '../tasks/tasks.service';
 import { CreateTaskDto } from './dtos/create-task.dto';
 import { IUser } from '@/common/interfaces/user.interface';
-import { ITask } from '@/common/interfaces/task.interface';
+import {
+  ITaskResponse,
+  ITaskResponseWithPagination,
+} from '@/common/interfaces/task.interface';
 import { UpdateTaskDto } from './dtos/update-task.dto';
 import { UpdateAuditTaskDto } from './dtos/update-audit-task.dto';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
@@ -42,7 +46,7 @@ export class TasksController {
   async createTask(
     @Body() createTaskDto: CreateTaskDto,
     @GetUser() user: IUser,
-  ) {
+  ): Promise<HttpExceptionOptions> {
     return await this.tasksService.create(createTaskDto, user);
   }
 
@@ -64,14 +68,14 @@ export class TasksController {
       }),
     )
     limit: number,
-  ) {
+  ): Promise<ITaskResponseWithPagination> {
     return await this.tasksService.getTasks(page, limit);
   }
 
   @Get('/:id')
   @Roles(Role.Auditor, Role.Staff, Role.Admin)
   @UseGuards(JwtGuard, RolesGuard)
-  async getTaskById(@Param('id') id: string): Promise<ITask> {
+  async getTaskById(@Param('id') id: string): Promise<ITaskResponse> {
     return await this.tasksService.getTaskById(id);
   }
 
@@ -89,7 +93,7 @@ export class TasksController {
     @Param('id') id: string,
     @Body() updateTaskDto: UpdateTaskDto,
     @GetUser() user: IUser,
-  ) {
+  ): Promise<HttpExceptionOptions> {
     return await this.tasksService.update(id, updateTaskDto, user);
   }
 
@@ -100,7 +104,7 @@ export class TasksController {
     @Param('id') id: string,
     @Body() updateAuditTaskDto: UpdateAuditTaskDto,
     @GetUser() user: IUser,
-  ) {
+  ): Promise<HttpExceptionOptions> {
     return await this.tasksService.auditTask(id, updateAuditTaskDto, user);
   }
 
@@ -110,14 +114,17 @@ export class TasksController {
   async draftTask(
     @Param('id') id: string,
     @Body() updateDraftTaskDto: UpdateDraftTaskDto,
-  ) {
+  ): Promise<HttpExceptionOptions> {
     return await this.tasksService.draftTask(id, updateDraftTaskDto);
   }
 
   @Delete('/:id')
   @Roles(Role.Auditor, Role.Staff, Role.Admin)
   @UseGuards(JwtGuard, RolesGuard)
-  async deleteTask(@Param('id') id: string, @GetUser() user: IUser) {
+  async deleteTask(
+    @Param('id') id: string,
+    @GetUser() user: IUser,
+  ): Promise<HttpExceptionOptions> {
     return await this.tasksService.deleteTask(id, user);
   }
 
@@ -129,7 +136,7 @@ export class TasksController {
     @Param('id') id: string,
     @GetUser() user: IUser,
     @Body() createCommentDto: CreateCommentDto,
-  ) {
+  ): Promise<HttpExceptionOptions> {
     return await this.tasksService.createComment(id, user, createCommentDto);
   }
 
@@ -140,7 +147,7 @@ export class TasksController {
     @Param('id') id: string,
     @GetUser() user: IUser,
     @Param('commentId') commentId: string,
-  ) {
+  ): Promise<HttpExceptionOptions> {
     return await this.tasksService.deleteComment(id, user, commentId);
   }
 
@@ -152,7 +159,7 @@ export class TasksController {
     @GetUser() user: IUser,
     @Body() updateCommentDto: UpdateCommentDto,
     @Param('commentId') commentId: string,
-  ) {
+  ): Promise<HttpExceptionOptions> {
     return await this.tasksService.updateComment(
       id,
       user,

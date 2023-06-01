@@ -2,12 +2,15 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dtos/login.dto';
 import * as Bcrypt from 'bcryptjs';
-import { UsersService } from '../users/users.service';
+import { InjectModel } from '@nestjs/mongoose';
+import { User } from '../users/schemas/user.schema';
+import { Model } from 'mongoose';
+import { IUser } from '@/common/interfaces/user.interface';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private usersService: UsersService,
+    @InjectModel(User.name) private readonly userModel: Model<IUser>,
     private jwtService: JwtService,
   ) {}
 
@@ -23,7 +26,7 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto): Promise<string> {
-    const user = await this.usersService.findOneByEmail(loginDto.email);
+    const user = await this.userModel.findOne({ email: loginDto.email });
 
     if (!user) {
       throw new HttpException('USER_NOT_FOUND', HttpStatus.NOT_FOUND);

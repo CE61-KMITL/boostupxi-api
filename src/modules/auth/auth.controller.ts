@@ -10,7 +10,10 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('login')
-  async login(@Body() loginDto: LoginDto, @Res() res: Response) {
+  async login(
+    @Body() loginDto: LoginDto,
+    @Res() res: Response,
+  ): Promise<Response> {
     const token = await this.authService.login(loginDto);
     res.setHeader('Authorization', token);
     return res.send({

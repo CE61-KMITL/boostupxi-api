@@ -3,50 +3,38 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Task } from '../tasks/schemas/task.schema';
 import { Model, Types } from 'mongoose';
 import { ITask } from '@/common/interfaces/task.interface';
-import { UsersService } from '../users/users.service';
-import { FilesService } from '../files/files.service';
 import { IFile } from '@/common/interfaces/file.interface';
 import { IUser } from '@/common/interfaces/user.interface';
 import { User } from '../users/schemas/user.schema';
+import { File } from '../files/schemas/file.schema';
 
 @Injectable()
 export class QuestionsService {
   constructor(
     @InjectModel(Task.name) private readonly taskModel: Model<ITask>,
     @InjectModel(User.name) private readonly userModel: Model<IUser>,
-    private usersService: UsersService,
-    private filesService: FilesService,
+    @InjectModel(File.name) private readonly fileModel: Model<IFile>,
   ) {}
 
   private async formattedQuestionData(question: ITask, userId: string) {
-    const user = await this.usersService.findById(question.author.toString());
-
-    question.author = {
-      username: user.username,
-    };
+    const user = await this.userModel.findById(question.author.toString());
 
     const fileKeys = await Promise.all(
       question.files.map(async (fileId) => {
-        const file = await this.filesService.findById(fileId.toString());
+        const file = await this.fileModel.findById(fileId.toString());
         return { id: file._id, key: file.key, url: file.url } as IFile;
       }),
-    );
-
-    question.files = fileKeys;
-
-    question.testcases = question.testcases.filter(
-      (testcase) => testcase.published,
     );
 
     return {
       _id: question._id,
       title: question.title,
       description: question.description,
-      author: question.author,
+      author: { username: user.username },
       level: question.level,
       tags: question.tags,
-      files: question.files,
-      testcases: question.testcases,
+      files: fileKeys,
+      testcases: question.testcases.filter((testcase) => testcase.published),
       createdAt: question.createdAt,
       updatedAt: question.updatedAt,
       passedByUser: question.passedBy.includes(new Types.ObjectId(userId)),
