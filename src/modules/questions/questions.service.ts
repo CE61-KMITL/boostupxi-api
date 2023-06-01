@@ -47,6 +47,7 @@ export class QuestionsService {
       createdAt: question.createdAt,
       updatedAt: question.updatedAt,
       passedByUser: question.passedBy.includes(new Types.ObjectId(userId)),
+      userPassCount: question.passedBy.length,
       score: question.level * 100,
       hintCost: question.level ? question.level * 40 : 0,
       ...(hint && { hint }),
@@ -124,10 +125,7 @@ export class QuestionsService {
 
     question.purchased_hint.push(user._id);
 
-    await this.userModel.findByIdAndUpdate(userId, { score: user.score });
-    await this.taskModel.findByIdAndUpdate(id, {
-      purchased_hint: question.purchased_hint,
-    });
+    await Promise.all([question.save(), user.save()]);
 
     throw new HttpException('BUY_HINT_SUCCESS', HttpStatus.OK);
   }

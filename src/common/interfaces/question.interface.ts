@@ -15,6 +15,7 @@ export interface IQuestionResponse {
   createdAt: Date;
   updatedAt: Date;
   passedByUser: boolean;
+  userPassCount: number;
   score: number;
   hintCost: number;
   hint?: string;
