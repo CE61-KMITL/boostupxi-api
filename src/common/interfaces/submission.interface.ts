@@ -1,5 +1,5 @@
 export interface ISubmission {
-  passed: boolean;
+  status: boolean;
   score: number;
   compilationResult: string;
 }

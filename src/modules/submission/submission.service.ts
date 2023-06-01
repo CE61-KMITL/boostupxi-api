@@ -30,6 +30,13 @@ export class SubmissionService {
       throw new HttpException('QUESTION_NOT_FOUND', HttpStatus.NOT_FOUND);
     }
 
+    if (question.status !== 'approved' || question.draft) {
+      throw new HttpException(
+        "YOU_CAN'T_GET_THIS_QUESTION",
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
     if (!user) {
       throw new HttpException('USER_NOT_FOUND', HttpStatus.NOT_FOUND);
     }
@@ -38,7 +45,7 @@ export class SubmissionService {
       addSubmissionDto.compilationResult,
     );
 
-    const isSubmitted = await this.taskModel.find({ passedBy: user._id });
+    const isSubmitted = question.passedBy.includes(user._id);
 
     if (status && !isSubmitted) {
       user.score += question.level * 100;
@@ -47,7 +54,7 @@ export class SubmissionService {
       await Promise.all([user.save(), question.save()]);
 
       return {
-        passed: true,
+        status,
         score: user.score,
         compilationResult: addSubmissionDto.compilationResult,
       };
@@ -60,10 +67,16 @@ export class SubmissionService {
       await Promise.all([user.save(), question.save()]);
 
       return {
-        passed: false,
+        status,
         score: user.score,
         compilationResult: addSubmissionDto.compilationResult,
       };
     }
+
+    return {
+      status,
+      score: user.score,
+      compilationResult: addSubmissionDto.compilationResult,
+    };
   }
 }
