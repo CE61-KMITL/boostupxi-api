@@ -40,6 +40,7 @@ export class UsersService {
       username: user.username,
       score: user.score,
       role: user.role,
+      group: user.group,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
       tasks: await Promise.all(formattedTasks),
