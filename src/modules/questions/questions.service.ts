@@ -1,4 +1,9 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpExceptionOptions,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Task } from '../tasks/schemas/task.schema';
 import { Model, Types } from 'mongoose';
@@ -7,6 +12,10 @@ import { IFile } from '@/common/interfaces/file.interface';
 import { IUser } from '@/common/interfaces/user.interface';
 import { User } from '../users/schemas/user.schema';
 import { File } from '../files/schemas/file.schema';
+import {
+  IQuestionResponse,
+  IQuestionResponseWithPagination,
+} from '@/common/interfaces/question.interface';
 
 @Injectable()
 export class QuestionsService {
@@ -16,7 +25,10 @@ export class QuestionsService {
     @InjectModel(File.name) private readonly fileModel: Model<IFile>,
   ) {}
 
-  private async formattedQuestionData(question: ITask, userId: string) {
+  private async formattedQuestionData(
+    question: ITask,
+    userId: string,
+  ): Promise<IQuestionResponse> {
     const user = await this.userModel.findById(question.author.toString());
 
     const fileKeys = await Promise.all(
@@ -49,12 +61,17 @@ export class QuestionsService {
       passedByUser: question.passedBy.includes(new Types.ObjectId(userId)),
       userPassCount: question.passedBy.length,
       score: question.level * 100,
-      hintCost: question.level ? question.level * 40 : 0,
+      hintCost: question.hint !== '' ? question.level * 40 : 0,
+      hasHint: question.hint !== '',
       ...(hint && { hint }),
     };
   }
 
-  async getQuestions(page = 1, limit = 10, userId: string) {
+  async getQuestions(
+    page = 1,
+    limit = 10,
+    userId: string,
+  ): Promise<IQuestionResponseWithPagination> {
     const questions = await this.taskModel
       .find({ status: 'approved', draft: false })
       .skip(limit * (page - 1))
@@ -77,7 +94,10 @@ export class QuestionsService {
     };
   }
 
-  async getQuestionById(id: string, userId: string) {
+  async getQuestionById(
+    id: string,
+    userId: string,
+  ): Promise<IQuestionResponse> {
     const question = await this.taskModel.findById(id);
 
     if (!question) {
@@ -93,7 +113,7 @@ export class QuestionsService {
     return this.formattedQuestionData(question, userId);
   }
 
-  async buyHint(id: string, userId: string) {
+  async buyHint(id: string, userId: string): Promise<HttpExceptionOptions> {
     const question = await this.taskModel.findById(id);
     const user = await this.userModel.findById(userId);
 
@@ -111,14 +131,21 @@ export class QuestionsService {
     if (question.purchased_hint.includes(user._id)) {
       throw new HttpException(
         'YOU_HAVE_BOUGHT_THIS_HINT',
-        HttpStatus.FORBIDDEN,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (question.hint === '') {
+      throw new HttpException(
+        'THIS_QUESTION_HAS_NO_HINT',
+        HttpStatus.BAD_REQUEST,
       );
     }
 
     const hintCost = question.level * 40;
 
     if (user.score < hintCost) {
-      throw new HttpException('NOT_ENOUGH_SCORE', HttpStatus.FORBIDDEN);
+      throw new HttpException('NOT_ENOUGH_SCORE', HttpStatus.BAD_REQUEST);
     }
 
     user.score -= hintCost;

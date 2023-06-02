@@ -19,4 +19,11 @@ export interface IQuestionResponse {
   score: number;
   hintCost: number;
   hint?: string;
+  hasHint: boolean;
+}
+
+export interface IQuestionResponseWithPagination {
+  data: IQuestionResponse[];
+  currentPage: number;
+  pages: number;
 }
