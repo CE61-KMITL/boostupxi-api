@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  HttpExceptionOptions,
   HttpStatus,
   Param,
   ParseIntPipe,
@@ -16,6 +17,10 @@ import { RolesGuard } from '@/common/guards/roles.guard';
 import { Roles } from '@/common/decorators/roles.decorator';
 import { GetUser } from '@/common/decorators/get-user.decorator';
 import { IUser } from '@/common/interfaces/user.interface';
+import {
+  IQuestionResponse,
+  IQuestionResponseWithPagination,
+} from '@/common/interfaces/question.interface';
 
 @ApiTags('Questions')
 @Roles(Role.User, Role.Staff, Role.Auditor, Role.Staff, Role.Admin)
@@ -41,17 +46,23 @@ export class QuestionsController {
     )
     limit: number,
     @GetUser() user: IUser,
-  ) {
+  ): Promise<IQuestionResponseWithPagination> {
     return this.questionsService.getQuestions(page, limit, user._id);
   }
 
   @Get('/:id')
-  async getQuestionById(@Param('id') id: string, @GetUser() user: IUser) {
+  async getQuestionById(
+    @Param('id') id: string,
+    @GetUser() user: IUser,
+  ): Promise<IQuestionResponse> {
     return this.questionsService.getQuestionById(id, user._id);
   }
 
   @Post('/:id/hint')
-  async buyHint(@Param('id') id: string, @GetUser() user: IUser) {
+  async buyHint(
+    @Param('id') id: string,
+    @GetUser() user: IUser,
+  ): Promise<HttpExceptionOptions> {
     return this.questionsService.buyHint(id, user._id);
   }
 }

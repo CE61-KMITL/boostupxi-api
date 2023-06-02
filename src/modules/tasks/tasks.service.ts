@@ -236,8 +236,7 @@ export class TasksService {
     if (!updatedTask.draft) {
       const embed = {
         title: `โจทย์ ${task.title} ถูกเพิ่มเข้าระบบแล้ว! 🎉`,
-        description:
-          'มีโจทย์ใหม่เข้ามาแล้วนะครับ [ไปเช็คกันเลย!](https://ceboostup.com/)',
+        description: `มีโจทย์ใหม่เข้ามาแล้วนะครับ [ไปเช็คกันเลย!](https://ceboostup.com/question/${task._id})`,
         color: 0x00ff00,
         author: {
           name: (await this.userModel.findById(task.author.toString()))
