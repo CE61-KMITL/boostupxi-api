@@ -11,7 +11,6 @@ export interface IUser extends Document {
   group: string;
   createdAt: Date;
   updatedAt: Date;
-  rank: number;
   completedQuestions: Types.ObjectId[];
 }
 
