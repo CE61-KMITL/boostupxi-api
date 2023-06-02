@@ -30,7 +30,7 @@ jobs:
           docker stop ceboostxi-api || true
           docker rm ceboostxi-api || true
 
-          docker run -d --always \
+          docker run --restart=always -d \
             -e PORT=$PORT \
             -e MONGO_URI=$MONGO_URI \
             -e ALLOWED_ORIGINS=$ALLOWED_ORIGINS \
