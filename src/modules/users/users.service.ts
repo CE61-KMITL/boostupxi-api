@@ -44,6 +44,7 @@ export class UsersService {
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
       tasks: await Promise.all(formattedTasks),
+      rank: 0,
       completedQuestionsCount: user.completedQuestions.length,
     };
   }
