@@ -1,7 +1,15 @@
 import { Role } from '@/common/enums/role.enum';
 import { JwtGuard } from '@/common/guards/jwt.guard';
 import { RolesGuard } from '@/common/guards/roles.guard';
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpExceptionOptions,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { Roles } from '@/common/decorators/roles.decorator';
 import { ApiTags } from '@nestjs/swagger';
 import { SubmissionService } from './submission.service';
@@ -21,7 +29,18 @@ export class SubmissionController {
   async submit(
     @Body() addSubmissionDto: AddSubmissionDto,
     @GetUser() user: IUser,
+  ): Promise<HttpExceptionOptions> {
+    return await this.submissionService.submit(addSubmissionDto, user._id);
+  }
+
+  @Get('/:questionId')
+  async getSubmissionByQuestionIdandUserId(
+    @Param('questionId') questionId: string,
+    @GetUser() user: IUser,
   ): Promise<ISubmission> {
-    return this.submissionService.submit(addSubmissionDto, user._id);
+    return await this.submissionService.getSubmissionByQuestionIdandUserId(
+      questionId,
+      user._id,
+    );
   }
 }

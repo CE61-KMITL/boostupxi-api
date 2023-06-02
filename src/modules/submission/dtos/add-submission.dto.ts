@@ -17,4 +17,12 @@ export class AddSubmissionDto {
   @IsString()
   @IsNotEmpty()
   compilationResult: string;
+
+  @ApiProperty({
+    example: 'console.log("Hello World")',
+    description: 'Source code of the submission',
+  })
+  @IsString()
+  @IsNotEmpty()
+  source_code: string;
 }

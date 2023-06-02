@@ -1,4 +1,4 @@
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 import { Role } from '../enums/role.enum';
 import { ITaskResponse } from './task.interface';
 
@@ -10,6 +10,7 @@ export interface IUser extends Document {
   role: Role;
   createdAt: Date;
   updatedAt: Date;
+  completedQuestions: Types.ObjectId[];
 }
 
 export interface IUserResponse {
@@ -21,4 +22,5 @@ export interface IUserResponse {
   createdAt: Date;
   updatedAt: Date;
   tasks: ITaskResponse[];
+  completedQuestionsCount: number;
 }
