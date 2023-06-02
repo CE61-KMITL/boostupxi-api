@@ -1,5 +1,5 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 import { Role } from '@/common/enums/role.enum';
 import { Group } from '@/common/enums/group.enum';
 
@@ -22,6 +22,9 @@ export class User extends Document {
 
   @Prop({ required: Group.None })
   group: string;
+
+  @Prop({ default: [] })
+  completedQuestions: Types.ObjectId[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

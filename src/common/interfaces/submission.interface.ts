@@ -1,5 +1,9 @@
+import { Types } from 'mongoose';
+
 export interface ISubmission {
-  passed: boolean;
-  score: number;
-  compilationResult: string;
+  user?: Types.ObjectId;
+  question?: Types.ObjectId;
+  source_code: string;
+  result: string;
+  status: boolean;
 }
