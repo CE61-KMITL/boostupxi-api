@@ -2,6 +2,7 @@ export interface IUserLeaderboard {
   username: string;
   score: number;
   rank: number;
+  group: string;
 }
 
 export interface IUserLeaderboardWithPagination {

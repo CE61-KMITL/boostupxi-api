@@ -5,9 +5,9 @@ import { Model } from 'mongoose';
 import { IUser } from '@/common/interfaces/user.interface';
 import {
   IGroupLeaderboard,
+  IUserLeaderboard,
   IUserLeaderboardWithPagination,
 } from '@/common/interfaces/leaderboard.interface';
-import { IUserLeaderboard } from '@/common/interfaces/leaderboard.interface';
 
 @Injectable()
 export class LeaderboardService {
@@ -31,21 +31,20 @@ export class LeaderboardService {
   ): Promise<IUserLeaderboardWithPagination> {
     const count = await this.userModel.countDocuments({ role: 'user' });
 
-    const leaderboardResult = await this.userModel
-      .find({ role: 'user' })
-      .select(
-        '-password -_id -email -role -createdAt -updatedAt -__v -completedQuestions',
-      )
-      .sort({ score: -1 })
-      .skip((page - 1) * limit)
-      .limit(limit);
+    const leaderboardResult = await this.userModel.aggregate([
+      { $match: { role: 'user' } },
+      { $sort: { score: -1 } },
+      { $skip: (page - 1) * limit },
+      { $limit: limit },
+      { $project: { _id: 0, username: 1, group: 1, score: 1 } },
+    ]);
 
     const pages = Math.ceil(count / limit);
 
     return {
       currentPage: page,
       pages,
-      data: this.calculateRank<IUser>(leaderboardResult, 'score'),
+      data: this.calculateRank<IUserLeaderboard>(leaderboardResult, 'score'),
     };
   }
 
