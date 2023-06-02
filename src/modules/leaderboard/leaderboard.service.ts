@@ -7,12 +7,23 @@ import {
   IGroupLeaderboard,
   IUserLeaderboardWithPagination,
 } from '@/common/interfaces/leaderboard.interface';
+import { IUserLeaderboard } from '@/common/interfaces/leaderboard.interface';
 
 @Injectable()
 export class LeaderboardService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<IUser>,
   ) {}
+
+  private calculateRank<T>(data: T[], scoreProperty: keyof T): T[] {
+    let rank = 1;
+    return data.map((item, index) => {
+      if (index > 0 && item[scoreProperty] !== data[index - 1][scoreProperty]) {
+        rank = index + 1;
+      }
+      return { ...item, rank };
+    });
+  }
 
   async getLeaderboard(
     page = 1,
@@ -31,18 +42,10 @@ export class LeaderboardService {
 
     const pages = Math.ceil(count / limit);
 
-    let rank = 1;
-    const rankedResult = leaderboardResult.map((user, index) => {
-      if (index > 0 && user.score !== leaderboardResult[index - 1].score) {
-        rank = index + 1;
-      }
-      return { ...user.toObject(), rank };
-    });
-
     return {
       currentPage: page,
       pages,
-      data: rankedResult,
+      data: this.calculateRank<IUser>(leaderboardResult, 'score'),
     };
   }
 
@@ -53,12 +56,6 @@ export class LeaderboardService {
       { $sort: { score: -1 } },
     ]);
 
-    let rank = 1;
-    return scoreByGroup.map((group, index) => {
-      if (index > 0 && group.score !== scoreByGroup[index - 1].score) {
-        rank = index + 1;
-      }
-      return { ...group, rank };
-    });
+    return this.calculateRank<IGroupLeaderboard>(scoreByGroup, 'score');
   }
 }
