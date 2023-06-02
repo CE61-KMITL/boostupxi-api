@@ -34,6 +34,11 @@ export class UsersService {
       this.tasksService.formattedTaskData(task),
     );
 
+    const usersWithHigherScore = await this.userModel.countDocuments({
+      score: { $gt: user.score },
+    });
+    const rank = usersWithHigherScore + 1;
+
     return {
       _id: user._id,
       email: user.email,
@@ -44,7 +49,7 @@ export class UsersService {
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
       tasks: await Promise.all(formattedTasks),
-      rank: 0,
+      rank,
       completedQuestionsCount: user.completedQuestions.length,
     };
   }
