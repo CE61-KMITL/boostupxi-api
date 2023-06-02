@@ -8,6 +8,7 @@ export interface IUser extends Document {
   password?: string;
   score: number;
   role: Role;
+  group: string;
   createdAt: Date;
   updatedAt: Date;
   completedQuestions: Types.ObjectId[];
@@ -18,6 +19,7 @@ export interface IUserResponse {
   email: string;
   username: string;
   score: number;
+  group: string;
   role: Role;
   createdAt: Date;
   updatedAt: Date;
