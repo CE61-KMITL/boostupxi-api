@@ -25,4 +25,5 @@ export interface IUserResponse {
   updatedAt: Date;
   tasks: ITaskResponse[];
   completedQuestionsCount: number;
+  rank: number;
 }
