@@ -34,17 +34,20 @@ export class LeaderboardService {
     const leaderboardResult = await this.userModel.aggregate([
       { $match: { role: 'user' } },
       { $sort: { score: -1 } },
-      { $skip: (page - 1) * limit },
-      { $limit: limit },
       { $project: { _id: 0, username: 1, group: 1, score: 1 } },
     ]);
 
     const pages = Math.ceil(count / limit);
 
+    const startIndex = (page - 1) * limit;
+
     return {
       currentPage: page,
       pages,
-      data: this.calculateRank<IUserLeaderboard>(leaderboardResult, 'score'),
+      data: this.calculateRank<IUserLeaderboard>(
+        leaderboardResult,
+        'score',
+      ).slice(startIndex, startIndex + limit),
     };
   }
 
