@@ -1,4 +1,4 @@
-# CE BoostUp XI - API
+# CE BoostUp XI - API 🚀
 
 CE BoostUp XI API is a RESTful API for CE BoostUp XI website. It is built with NodeJS and NestJS framework.
 
