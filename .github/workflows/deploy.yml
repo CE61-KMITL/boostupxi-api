@@ -31,4 +31,18 @@ jobs:
           docker build --no-cache . \
             --file Dockerfile \
             --tag ceboostxi-api
-          docker run --restart=always -d -e PORT=$PORT -e MONGO_URI=$MONGO_URI -e ALLOWED_ORIGINS=$ALLOWED_ORIGINS -e JWT_SECRET=$JWT_SECRET -e NODE_ENV=$NODE_ENV -e AWS_BUCKET=$AWS_BUCKET -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY -e AWS_REGION=$AWS_REGION -e DISCORD_WEBHOOK_URL=$DISCORD_WEBHOOK_URL -e DISCORD_WEBHOOK_USERNAME=$DISCORD_WEBHOOK_USERNAME -p 5050:5050 --name ceboostxi-api ceboostxi-api
+          docker run --restart always -d \
+            -e PORT=$PORT \
+            -e MONGO_URI=$MONGO_URI \
+            -e ALLOWED_ORIGINS=$ALLOWED_ORIGINS \
+            -e JWT_SECRET=$JWT_SECRET \
+            -e NODE_ENV=$NODE_ENV \
+            -e AWS_BUCKET=$AWS_BUCKET \
+            -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+            -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+            -e AWS_REGION=$AWS_REGION \
+            -e DISCORD_WEBHOOK_URL=$DISCORD_WEBHOOK_URL \
+            -e DISCORD_WEBHOOK_USERNAME=$DISCORD_WEBHOOK_USERNAME \
+            -p 5050:5050 \
+            --name ceboostxi-api \
+            ceboostxi-api
