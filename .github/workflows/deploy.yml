@@ -45,4 +45,4 @@ jobs:
             -e DISCORD_WEBHOOK_USERNAME=$DISCORD_WEBHOOK_USERNAME \
             -p 5050:5050 \
             --name ceboostxi-api \
-            ceboostxi-api
+            ceboostxi-api:latest
