@@ -42,6 +42,12 @@ export class Task extends Document {
 
   @Prop({ default: [] })
   comments: IComment[];
+
+  @Prop({ default: [] })
+  purchased_hint: Types.ObjectId[];
+
+  @Prop({ default: [] })
+  passedBy: Types.ObjectId[];
 }
 
 export const TaskSchema = SchemaFactory.createForClass(Task);

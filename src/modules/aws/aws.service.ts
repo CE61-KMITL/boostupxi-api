@@ -4,7 +4,9 @@ import {
   S3Client,
   PutObjectCommand,
   DeleteObjectCommand,
+  DeleteObjectCommandOutput,
 } from '@aws-sdk/client-s3';
+import { IFile } from '@/common/interfaces/file.interface';
 
 @Injectable()
 export class AwsService {
@@ -27,7 +29,9 @@ export class AwsService {
     return `${originalFileName}~${newDate.toISOString()}.${extension}`;
   }
 
-  async uploadFiles(files: Array<Express.Multer.File>) {
+  async uploadFiles(
+    files: Array<Express.Multer.File>,
+  ): Promise<{ key: string; url: string }[]> {
     try {
       const promises = files.map(async (file) => {
         const params = {
@@ -48,7 +52,9 @@ export class AwsService {
     }
   }
 
-  async deleteFiles(files: Array<{ key: string }>) {
+  async deleteFiles(
+    files: Array<{ key: string }>,
+  ): Promise<DeleteObjectCommandOutput[]> {
     try {
       const promises = files.map((file) => {
         const params = {

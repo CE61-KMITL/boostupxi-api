@@ -12,6 +12,10 @@ import { JwtGuard } from '@/common/guards/jwt.guard';
 import { Roles } from '@/common/decorators/roles.decorator';
 import { Role } from '@/common/enums/role.enum';
 import { RolesGuard } from '@/common/guards/roles.guard';
+import {
+  IGroupLeaderboard,
+  IUserLeaderboardWithPagination,
+} from '@/common/interfaces/leaderboard.interface';
 
 @ApiTags('Leaderboard')
 @Roles(Role.User, Role.Staff, Role.Auditor, Role.Staff, Role.Admin)
@@ -36,12 +40,12 @@ export class LeaderboardController {
       }),
     )
     limit: number,
-  ) {
+  ): Promise<IUserLeaderboardWithPagination> {
     return await this.leaderboardService.getLeaderboard(page, limit);
   }
 
   @Get('/group')
-  async getLeaderboardByGroup() {
+  async getLeaderboardByGroup(): Promise<IGroupLeaderboard[]> {
     return await this.leaderboardService.getLeaderboardByGroup();
   }
 }
