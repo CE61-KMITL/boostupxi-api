@@ -28,3 +28,11 @@ npm run start:dev
 ```bash
 docker-compose up -d
 ```
+
+## Deployment
+
+- Build Docker image
+
+```bash
+docker build -t ceboostup-api .
+```
