@@ -23,7 +23,6 @@ jobs:
             -e MONGO_URI=${{ secrets.MONGO_URI }} \
             -e ALLOWED_ORIGINS=${{ secrets.ALLOWED_ORIGINS }} \
             -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
-            -e NODE_ENV='production' \
             -e AWS_BUCKET=${{ secrets.AWS_BUCKET }} \
             -e AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} \
             -e AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} \
