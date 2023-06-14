@@ -13,7 +13,6 @@ jobs:
       - uses: actions/checkout@v3
       - name: Build
         run: |
-          docker prune -f
           docker build --no-cache . \
             --file Dockerfile \
             --tag ceboostxi-api
