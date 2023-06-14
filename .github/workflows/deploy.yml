@@ -11,12 +11,17 @@ jobs:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v3
-      - name: Build
+      - name: Clear Cache
+        run: |
+          docker stop ceboostxi-api
+          docker rm ceboostxi-api
+          docker rmi ceboostxi-api:latest
+      - name: Build Image
         run: |
           docker build --no-cache . \
             --file Dockerfile \
             --tag ceboostxi-api
-      - name: Run
+      - name: Run Image
         run: |
           docker run --restart always -d \
             -e PORT=${{ secrets.PORT }} \
