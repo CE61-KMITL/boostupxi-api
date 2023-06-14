@@ -11,38 +11,26 @@ jobs:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v3
-      - name: Build and Deploy
-        env:
-          PORT: ${{ secrets.PORT }}
-          NODE_ENV: 'production'
-          MONGO_URI: ${{ secrets.MONGO_URI }}
-          ALLOWED_ORIGINS: ${{ secrets.ALLOWED_ORIGINS }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          AWS_BUCKET: ${{ secrets.AWS_BUCKET }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          DISCORD_WEBHOOK_USERNAME: ${{ secrets.DISCORD_WEBHOOK_USERNAME }}
-
+      - name: Build
         run: |
-          docker stop ceboostxi-api || true
-          docker rm ceboostxi-api || true
+          docker prune -f
           docker build --no-cache . \
             --file Dockerfile \
             --tag ceboostxi-api
+      - name: Run
+        run: |
           docker run --restart always -d \
-            -e PORT=$PORT \
-            -e MONGO_URI=$MONGO_URI \
-            -e ALLOWED_ORIGINS=$ALLOWED_ORIGINS \
-            -e JWT_SECRET=$JWT_SECRET \
-            -e NODE_ENV=$NODE_ENV \
-            -e AWS_BUCKET=$AWS_BUCKET \
-            -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
-            -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
-            -e AWS_REGION=$AWS_REGION \
-            -e DISCORD_WEBHOOK_URL=$DISCORD_WEBHOOK_URL \
-            -e DISCORD_WEBHOOK_USERNAME=$DISCORD_WEBHOOK_USERNAME \
-            -p 5050:5050 \
+            -e PORT=${{ secrets.PORT }} \
+            -e MONGO_URI=${{ secrets.MONGO_URI }} \
+            -e ALLOWED_ORIGINS=${{ secrets.ALLOWED_ORIGINS }} \
+            -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
+            -e NODE_ENV='production' \
+            -e AWS_BUCKET=${{ secrets.AWS_BUCKET }} \
+            -e AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} \
+            -e AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} \
+            -e AWS_REGION=${{ secrets.AWS_REGION }} \
+            -e DISCORD_WEBHOOK_URL=${{ secrets.DISCORD_WEBHOOK_URL }} \
+            -e DISCORD_WEBHOOK_USERNAME=${{ secrets.DISCORD_WEBHOOK_USERNAME }} \
+            -p ${{ secrets.PORT }}:${{ secrets.PORT }} \
             --name ceboostxi-api \
             ceboostxi-api:latest
