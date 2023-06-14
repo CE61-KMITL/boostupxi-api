@@ -35,9 +35,9 @@ export class LoggerMiddleware implements NestMiddleware {
       const { statusCode } = response;
       const contentLength = response.get('content-length');
       const logMessage = `${dateTime}\t${uuidv4()}\t${method}\t${originalUrl}\t${statusCode}\t${contentLength}\t${userAgent}\t${ip}\n`;
-      this.logger.log(
-        `${method} ${originalUrl} ${statusCode} ${contentLength} - ${userAgent} ${ip}`,
-      );
+      // this.logger.log(
+      //   `${method} ${originalUrl} ${statusCode} ${contentLength} - ${userAgent} ${ip}`,
+      // );
       try {
         fs.appendFileSync(this.logFile, logMessage);
       } catch (error) {
