@@ -34,6 +34,5 @@ jobs:
             -e AWS_REGION=${{ secrets.AWS_REGION }} \
             -e DISCORD_WEBHOOK_URL=${{ secrets.DISCORD_WEBHOOK_URL }} \
             -e DISCORD_WEBHOOK_USERNAME=${{ secrets.DISCORD_WEBHOOK_USERNAME }} \
-            -p ${{ secrets.PORT }}:${{ secrets.PORT }} \
             --name ceboostxi-api \
             ceboostxi-api:latest
