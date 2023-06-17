@@ -33,7 +33,7 @@ export class CreateTaskDto {
     description: 'Level of the task',
   })
   @IsNumber()
-  @Min(1)
+  @Min(0)
   @Max(5)
   @IsNotEmpty()
   level: number;
