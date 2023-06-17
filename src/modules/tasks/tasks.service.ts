@@ -42,7 +42,7 @@ export class TasksService {
 
     const comments = await Promise.all(
       task.comments.map(async (comment) => {
-        const user = await this.userModel.findById(task.author.toString());
+        const user = await this.userModel.findById(comment.author.toString());
 
         comment.author = {
           username: user.username,
