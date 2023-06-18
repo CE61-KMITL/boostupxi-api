@@ -46,16 +46,8 @@ export class QuestionsController {
     )
     limit: number,
     @GetUser() user: IUser,
-    @Query('tag') tag?: string,
-    @Query('level') level?: number,
   ): Promise<IQuestionResponseWithPagination> {
-    return this.questionsService.getQuestions(
-      page,
-      limit,
-      user._id,
-      tag,
-      level,
-    );
+    return this.questionsService.getQuestions(page, limit, user._id);
   }
 
   @Get('/:id')

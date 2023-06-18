@@ -71,21 +71,21 @@ export class QuestionsService {
     page = 1,
     limit = 10,
     userId: string,
-    tag?: string,
-    level?: number,
   ): Promise<IQuestionResponseWithPagination> {
     const questions = await this.taskModel
       .find({
         status: 'approved',
         draft: false,
-        ...(level && { level }),
-        ...(tag && { tags: { $in: [tag] } }),
       })
       .skip(limit * (page - 1))
-      .limit(limit);
+      .limit(limit)
+      .sort({ level: 1 });
 
     const count = await this.taskModel
-      .find({ status: 'approved', draft: false })
+      .find({
+        status: 'approved',
+        draft: false,
+      })
       .countDocuments();
 
     const pages = Math.ceil(count / limit);
