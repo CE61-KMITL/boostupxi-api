@@ -69,35 +69,34 @@ export class QuestionsService {
 
   async getQuestions(
     page = 1,
-    limit = 10,
+    limit = 9,
     userId: string,
   ): Promise<IQuestionResponseWithPagination> {
+    const query = {
+      status: 'approved',
+      draft: false,
+    };
+
+    const totalQuestions = await this.taskModel.countDocuments(query);
+
+    const totalPages = Math.ceil(totalQuestions / limit);
+
+    const skipCount = (page - 1) * limit || 0;
+
     const questions = await this.taskModel
-      .find({
-        status: 'approved',
-        draft: false,
-      })
-      .skip(limit * (page - 1))
-      .limit(limit)
-      .sort({ level: 1 });
+      .find(query)
+      .sort({ level: 1, updatedAt: -1 })
+      .skip(skipCount)
+      .limit(limit);
 
-    const count = await this.taskModel
-      .find({
-        status: 'approved',
-        draft: false,
-      })
-      .countDocuments();
-
-    const pages = Math.ceil(count / limit);
-
-    const formattedQuestion = questions.map((question) =>
-      this.formattedQuestionData(question, userId),
+    const formattedQuestions = await Promise.all(
+      questions.map((question) => this.formattedQuestionData(question, userId)),
     );
 
     return {
       currentPage: page,
-      pages,
-      data: await Promise.all(formattedQuestion),
+      pages: totalPages,
+      data: formattedQuestions,
     };
   }
 
