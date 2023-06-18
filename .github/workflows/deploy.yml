@@ -18,9 +18,7 @@ jobs:
           docker rmi ceboostxi-api:latest || true
       - name: Build Image
         run: |
-          docker build --no-cache . \
-            --file Dockerfile \
-            --tag ceboostxi-api
+          docker build . --file Dockerfile --tag ceboostxi-api
       - name: Run Image
         run: |
           docker run --restart always -d \
